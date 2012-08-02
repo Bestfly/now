@@ -9,9 +9,8 @@ setmetatable(_G, {
     end,
 })
 
-local mdl_index = require("now.index")
-
-local flag,msg = pcall(mdl_index.execute)
+local control = require("now.control")
+local flag, msg = pcall(control.execute)
 if flag == false then
 	ngx.say(msg)
     ngx.say("system error")
