@@ -1,7 +1,10 @@
----session处理
+---simple session module
 module("now.session", package.seeall)
 
-local mt = { __index = now.session}
+local mt = {__index = now.session}
+
+function new()
+end
 
 function make_session()
 end
