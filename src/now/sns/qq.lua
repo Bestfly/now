@@ -1,14 +1,15 @@
 ---腾讯朋友网的接口
 module("now.sns.qq",package.seeall)
 
-local mt = { __index = nao.sns.qq}
-local now = require("now.now")
+local _cls = now.sns.qq
+local _mt = { __index = _cls}
+local _base = require("now.base")
 
 ---新建一个对象
 --@param o  传入的配置参数，请传入 pf参数，userip参数
 function new(self, o)
     o["format"] ="json"
-    return setmetatable(o, mt)
+    return setmetatable(o, _mt)
 end
 
 ---针对腾讯平台，对传递参数进行一些修正
@@ -95,7 +96,7 @@ local function _post(self, method,para)
     end
     local js = encode.json_decode(ret)
     if js == nil or js["ret"] ~=0 then
-        fw.err("朋友接口异常："..tostring(ret).." url="..url)
+        _base.err("朋友接口异常："..tostring(ret).." url="..url)
     end
     return js
 end
@@ -130,7 +131,7 @@ end
 --@usage    
 --@return   table   所查询的玩家详细信息
 function get_user(self, uid, session)
-    local tmp = fw.split(session,"|")
+    local tmp = _base.split(session,"|")
     local param = {
     openid=tmp[1],
     openkey=tmp[2]
@@ -151,7 +152,7 @@ function get_user(self, uid, session)
         if tmp["figureurl"] == nil or tmp["figureurl"] == "" then
             local cfg = require(ngx.ctx.app..".cfg.py.cfg")
             local fw = require("nao.fw")
-            tmp["figureurl"] = cfg[fw.ver]["img_url"].."ui/avatar.png"
+            tmp["figureurl"] = cfg[_base.ver]["img_url"].."ui/avatar.png"
         end
         tmp["nickname"] = string.gsub(tmp["nickname"],"%'","")
         tmp["nickname"] = string.gsub(tmp["nickname"],'%"',"")
@@ -178,7 +179,7 @@ end
 --@usage    
 --@return   table   好友列表
 function appfriend(session)
-    local tmp = fw.split(session,"|")
+    local tmp = _base.split(session,"|")
     local param = {
     openid=tmp[1],
     openkey=tmp[2],
@@ -194,6 +195,6 @@ function appfriend(session)
     return ret
 end
 
-getmetatable(now.sns.qq).__newindex = function (table, key, val)
+getmetatable(_cls).__newindex = function (table, key, val)
     error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
 end

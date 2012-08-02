@@ -1,8 +1,10 @@
 ---人人网的接口
-module("nao.sns.rr",package.seeall)
+module("now.sns.rr",package.seeall)
 
-local mt = { __index = nao.sns.rr}
-local fw = require("nao.fw")
+local _cls = now.sns.rr
+local _mt = { __index = _cls}
+local _base = require("nao.base")
+
 local pairs = pairs
 local tostring = tostring
 local table = table
@@ -11,7 +13,7 @@ function new(self,o)
 	o["format"] = "json"
 	o["v"]= "1.0"
 	o["callid"] = ngx.time()
-    return setmetatable(o, mt)
+    return setmetatable(o, _mt)
 end
 
 --发送http请求到人人网的服务器，并得到返回结果
@@ -37,8 +39,8 @@ function _post(self, method, para)
 	table.insert(sorted,self.secret)
 	para["sig"] = ngx.md5(table.concat(sorted))
 	
-   local rec = fw.http_send(self.apiurl,para,true)
-    local ret = fw.json_decode(rec)
+    local rec = _base.http_send(self.apiurl, para, true)
+    local ret = _base.json_decode(rec)
     
     if ret==nil or ret["error_code"]~=nil then
     	error("人人网服务器验证错误。"..ret["error_code"])
@@ -142,6 +144,6 @@ function complete(self, para)
     return (tostring(ret["result"]) == "1")
 end
 
-getmetatable(nao.sns.rr).__newindex = function (table, key, val)
+getmetatable(_cls).__newindex = function (table, key, val)
     error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
 end
