@@ -1,10 +1,11 @@
----session处理
-module("now.session", package.seeall)
+---simple template compiled module
+module("now.tpl", package.seeall)
 
----得到模板数据
---@param    tpl   string  模板名称。比如index   或者 blog.index
---@param    key   string  模板的key
---@param    data  table   模板数据内容
+---get result string from template file
+--@param    tpl   string  template file name. also is a lua module
+--@param    key   string  the key of the lua module
+--@param    data  table   data for compiled
+--@author   outrace@gmail.com
 function tpl(tpl, key, data)
     local mdl = require("app.tpl."..site)
     local tpl = mdl[key]
