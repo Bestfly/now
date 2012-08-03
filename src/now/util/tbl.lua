@@ -16,11 +16,16 @@ end
 ---将一个table的值增加到另外一个table中
 --@param	tbl		table	目标表
 --@param	newdata	table	被合并的table
+--@param	force	boolean	是否强制合并
 --@usage	
 --@return void
-function add_to_tbl(tbl, newdata)
+function add_to_tbl(tbl, newdata, force)
 	for n in pairs(newdata) do
-		tbl[n] = newdata[n]
+		if force then
+			tbl[n] = newdata[n]
+		elseif tbl[n] = nil then
+			tbl[n] = newdata[n]
+		end
 	end
 end
 
@@ -29,16 +34,16 @@ end
 --@usage	
 --@return   table   已经根据key排序过的数组
 function sort_by_key(tbl)
-  local tmp = {}
-  for k in pairs(tbl) do
-     table.insert(tmp,k)
-  end
-  table.sort(tmp)
-  local sorted = {}
-  for i,n in ipairs(tmp) do
-    table.insert(sorted,n)
-  end
-  return sorted
+	local tmp = {}
+	for k in pairs(tbl) do
+		table.insert(tmp,k)
+	end
+	table.sort(tmp)
+	local sorted = {}
+	for i,n in ipairs(tmp) do
+		table.insert(sorted,n)
+	end
+	return sorted
 end
 
 ---将k={}的数组转成纯数组
