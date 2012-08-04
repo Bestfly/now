@@ -51,9 +51,9 @@ end
 function err(msg,code)
     if code == nil then code = 1 end
 	if msg == nil then msg = 'err' end
-    ngx.print(json_encode({_m=msg,_c=code,_time=ngx.time()}))
-	local tpl = "%s|%s|%s"
-	ngx.log(ngx.ERR,string.format(tpl,tostring(code),tostring(ngx.ctx.uid),tostring(msg)))
+    ngx.print(json_encode({_m=msg, _c=code, _time=ngx.time()}))
+	local tpl = "%s|%s"
+	ngx.log(ngx.ERR, string.format(tpl,tostring(code), tostring(msg)))
 	error('')
 end
 

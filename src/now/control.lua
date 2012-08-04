@@ -1,11 +1,10 @@
 ---the main contoler
 module("now.control", package.seeall)
-local suf = ".do"
-local base = require("now.base")
-local dao = require("now.dao")
-local session = require("now.session")
-local cache = require("now.cache")
-local cfg = require("app.cfg.cfg")
+
+local _base = require("now.base")
+local _dao = require("now.dao")
+local _session = require("now.session")
+local _cache = require("now.cache")
 
 ---main flow
 function execute()
@@ -14,11 +13,11 @@ function execute()
 
 	--['应用名','模块名','方法名']
 	
-	ngx.ctx["dao"]= dao:new{
+	ngx.ctx["dao"]= _dao:new{
 	}
-	ngx.ctx["cache"] = cache:new{
+	ngx.ctx["cache"] = _cache:new{
 	}
-	ngx.ctx["session"] = session:new{
+	ngx.ctx["session"] = _session:new{
 	}
 
 	local flag,msg = pcall(fw.execute)

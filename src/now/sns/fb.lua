@@ -2,7 +2,7 @@
 module("now.sns.fb",package.seeall)
 
 local _cls = nao.sns.fb
-local _mt = { __index = nao.sns.qq}
+local _mt = { __index = _cls}
 local _base = require("now.base")
 
 getmetatable(_cls).__newindex = function (table, key, val)
