@@ -54,7 +54,7 @@ function err(msg,code)
     ngx.print(json_encode({_m=msg, _c=code, _time=ngx.time()}))
 	local tpl = "%s|%s"
 	ngx.log(ngx.ERR, string.format(tpl,tostring(code), tostring(msg)))
-	error('')
+	error("")
 end
 
 --使用ngx_lua内置的非阻塞http方式发送一次http请求,并得到返回结果
@@ -82,3 +82,4 @@ function http_send(url, para, is_post)
 	end
 	return res.body
 end
+

@@ -3,31 +3,31 @@ module("now.cache",package.seeall)
 
 local mt = { __index = now.cache}
 
-function new()
+function new(self, o)
 end
 
-function commit()
+function commit(self)
 end
 
-function rollback()
+function rollback(self)
 end
 
-function get(mdl, key)
+function get(self, mdl, key)
 end
 
-function mget(mdl, keys)
+function mget(self, mdl, keys)
 end
 
-function set(mdl, key, val, expired)
+function set(self, mdl, key, val, expired)
 end
 
-function mset(mdl, tbl, expired)
+function mset(self, mdl, tbl, expired)
 end
 
-function del(mdl, key)
+function del(self, mdl, key)
 end
 
-function mdel(mdl, tbl)
+function mdel(self, smdl, tbl)
 end
 
 getmetatable(now.cache).__newindex = function (table, key, val)
