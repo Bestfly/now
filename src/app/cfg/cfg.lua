@@ -4,6 +4,8 @@ local pairs = pairs
 module('app.cfg.cfg')
 local data={
 dev = {
+suf = ".do",  --后缀
+index = "home.index", --默认的控制器
 },
 
 test = {

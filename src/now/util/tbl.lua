@@ -99,7 +99,7 @@ end
 --			mdl.mv_tbl_field(tbl2,{"k1"})
 --@return   void
 function mv_fields(tbl,fields)
-    if table.getn(tbl) == 0 then --一般空的table和hash的table都会返回0
+    if #tbl == 0 then --一般空的table和hash的table都会返回0
         for f in pairs(fields) do
             tbl[f] = nil
         end
@@ -111,3 +111,48 @@ function mv_fields(tbl,fields)
         end
     end
 end
+
+---只返回某tbl中的一部分字段
+function fetch_fields(tbl, fields)
+	local ret = {}
+	if #tbl == 0 then
+        for f in pairs(fields) do
+            ret[f] = tbl[f]
+        end
+	else
+		for i, k in ipairs(tbl) do
+			ret[i] = {}
+			for f in pairs(fields) do
+				ret[i][f] = k[f]
+			end
+		end
+	end
+	return ret
+end
+
+---检查是否是map类型，并且含有key的table。空的话我们返回false
+function is_map(tbl)
+	if #tbl == 0 then
+		for _, _ in pairs(tbl) do
+			return true
+		end
+	end
+	return false
+end
+
+---get map table keys
+function keys(tbl)
+	local ret = {}
+	if #tbl == 0 then
+		for k,_ in paris(tbl) do
+			table.insert(ret, k)
+		end
+	else
+		for i, _ in iparis(tbl) do
+			table.insert(ret, i)
+		end
+	end
+	return ret
+end
+
+

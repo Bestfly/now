@@ -1,33 +1,35 @@
 ---data access object
 module("now.dao",package.seeall)
 
-local mt = { __index = now.dao}
-local base = require("now.base")
+local _cls = now.dao
+local _mt = { __index = _cls}
+local _base = require("now.base")
 
-function new(o)
+function new(self, o)
+	
 end
 
-function begin()
+function begin(self)
 end
 
-function commit()
+function commit(self)
 end
 
-function rollback()
+function rollback(self)
 end
 
-function get(mdl, filter, page, order, get_one)
+function get(self, mdl, filter,  page,  order,  get_one)
 end
 
-function mdf(mdl, filter, data)
+function mdf(self, mdl, filter, data)
 end
 
-function del(mdl, filter)
+function del(self, mdl, filter)
 end
 
-function find(mdl)
+function find(self, mdl)
 end
 
-getmetatable(now.dao).__newindex = function (table, key, val)
+getmetatable(_cls).__newindex = function (table, key, val)
     error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
 end

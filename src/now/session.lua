@@ -51,6 +51,7 @@ function destroy(self)
 	return self:_save()
 end
 
+-- save session data
 function _save(self)
 	local json_str = _base.json_encode(self._data)
 	return json_str
