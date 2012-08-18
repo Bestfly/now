@@ -11,6 +11,7 @@ function rollback(self)
 end
 
 function commit(self)
+
 end
 
 ---传递参数 {host, port, keepalive,  timeout

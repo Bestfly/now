@@ -164,7 +164,7 @@ local function _fetch_result(method, host, port, str)
     code = tonumber(code)
     if not code then
     	sock::close()
-		return nil,nil,nil, "read status error"
+		return nil, nil, nil, "read status error"
     end
     ret["code"] = code
     
@@ -175,7 +175,7 @@ local function _fetch_result(method, host, port, str)
     end
     ret["header"] = header
     
-    if method == "POST" then
+    if method == "POST" or method == "PUT" then
     	local t = headers["transfer-encoding"]
     	local body, err
     	if t and t ~= "identity" then
@@ -290,19 +290,40 @@ function get(url, header, para)
 	return _fetch_result("GET", uri['host'], uri['port'], header)
 end
 
----发送post请求
-function post(url, header, body, json)
+function delete(url, header)
 	local uri = _get_uri(url)
+	local header = _get_head(uri, header)
+	local str = _build_str("GET", uri, header)
+	return _fetch_result("DELETE", uri['host'], uri['port'], header)
+end
+
+---发送post请求
+function post(url, header, body)
+	local uri = _get_uri(url)
+	--[[
 	if json then
 		body = _base.json_encode(body)
+		header["Content-Length"] = "application/json"
 	else
 		body = ngx.encode_args(body)
 		header["Content-Length"] = "application/x-www-form-urlencoded"
 	end
+	--]]
 	header["Content-Length"] = #body
 	local header = _get_head(uri, header)
 	local str = _build_str("POST", uri, header)
 	str = str.."\r\n\r\n"..body
 	
-	return _fetch_result("GET", uri['host'], uri['port'], header)
+	return _fetch_result("POST", uri['host'], uri['port'], header)
 end
+
+function put(url, header, body, json)
+	local uri = _get_uri(url)
+	header["Content-Length"] = #body
+	local header = _get_head(uri, header)
+	local str = _build_str("PUT", uri, header)
+	str = str.."\r\n\r\n"..body
+	return _fetch_result("PUT", uri['host'], uri['port'], header)
+end
+
+

@@ -4,6 +4,7 @@ module("now.cache.memcached",package.seeall)
 local _cls = now.cache.memcache
 local _mt = { __index = _cls}
 local _memcached = require("resty.memcached")
+local _tbl = require("now.util.tbl")
 
 ---传递参数 {host, port, keepalive,  timeout
 function new(self, o)
