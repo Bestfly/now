@@ -18,7 +18,7 @@ function new(self, o)
     return setmetatable(o, mt)
 end
 
-local function do_send(self, cmd)
+local function _do_send(self, cmd)
 	local sock = self.sock
     local cmd_str = _base.json_encode(cmd)
     local len = 100000 + #cmd_str;
@@ -63,7 +63,7 @@ function send(self, to, msg)
     end
     
     local cmd = {cmd="chat", from="", to=to, msg=msg}
-    return self::do_send(cmd)
+    return self:_do_send(cmd)
 end
 
 ---关闭sock

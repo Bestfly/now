@@ -5,6 +5,9 @@ local _cls = now.db.mysql
 local _mt = { __index = _cls}
 local _base = require("now.base")
 
+local funciton _open()
+end
+
 function new(self, o)
 end
 
@@ -17,10 +20,10 @@ end
 function rollback(self)
 end
 
-function query(self)
+function query(self, sql)
 end
 
-function execute(self)
+function execute(self, sql)
 end
 
 getmetatable(_cls).__newindex = function (table, key, val)

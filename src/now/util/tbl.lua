@@ -8,7 +8,9 @@ module("now.util.tbl", package.seeall)
 --@return   true/false  
 function in_tbl(tbl, val)
     for n in pairs(tbl) do
-        if tbl[n] == val then return true end
+        if tbl[n] == val then 
+        	return true 
+        end
     end
     return false
 end
