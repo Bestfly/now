@@ -6,7 +6,7 @@ module("now.util.tbl", package.seeall)
 --@param    val     any     需要检查的value
 --@usage	
 --@return   true/false  
-function in_tbl(tbl, val)
+function inTbl(tbl, val)
     for n in pairs(tbl) do
         if tbl[n] == val then 
         	return true 
@@ -21,21 +21,22 @@ end
 --@param	force	boolean	是否强制合并
 --@usage	
 --@return void
-function add_to_tbl(tbl, newdata, force)
+function addToTbl(tbl, newdata, force)
 	for n in pairs(newdata) do
 		if force then
 			tbl[n] = newdata[n]
-		elseif tbl[n] = nil then
+		elseif tbl[n] == nil then
 			tbl[n] = newdata[n]
 		end
 	end
 end
 
+
 ---根据key重新排序table项
 --@param    tbl     table   需要排序的map类型数组
 --@usage	
 --@return   table   已经根据key排序过的数组
-function sort_by_key(tbl)
+function sortByKey(tbl)
 	local tmp = {}
 	for k in pairs(tbl) do
 		table.insert(tmp,k)
@@ -55,7 +56,7 @@ end
 --			local tbl = {k1={f1="v1",f2="v2",f3="v3"}}<br/>
 --			local ret = mdl.map_to_arr(tbl})
 --@return   table
-function map_to_arr(tbl, key)
+function mapToArr(tbl, key)
     if key == nil then key = "id" end
     local newt = {}
     for k in pairs(tbl) do
@@ -100,7 +101,7 @@ end
 --			local tbl2 = {{k1="v1",k2="v2"},{k1="vv1",k2="vv2"}}<br/>
 --			mdl.mv_tbl_field(tbl2,{"k1"})
 --@return   void
-function mv_fields(tbl,fields)
+function mvFields(tbl,fields)
     if #tbl == 0 then --一般空的table和hash的table都会返回0
         for f in pairs(fields) do
             tbl[f] = nil
@@ -115,7 +116,7 @@ function mv_fields(tbl,fields)
 end
 
 ---只返回某tbl中的一部分字段
-function fetch_fields(tbl, fields)
+function fetchFields(tbl, fields)
 	local ret = {}
 	if #tbl == 0 then
         for f in pairs(fields) do
@@ -133,7 +134,7 @@ function fetch_fields(tbl, fields)
 end
 
 ---检查是否是map类型，并且含有key的table。空的话我们返回false
-function is_map(tbl)
+function isMap(tbl)
 	if #tbl == 0 then
 		for _, _ in pairs(tbl) do
 			return true
@@ -142,19 +143,40 @@ function is_map(tbl)
 	return false
 end
 
+---格式化输出一个tbl
+function dump(tbl)
+	local ret = '{'
+	if #tbl == 0 then
+		for _, v in ipairs(tbl) do
+			if type(v) == 'table' then
+				ret = ret..dump(v)..",\n"
+			else
+				ret = ret..tostring(v)..",\n"
+			end
+		end
+	else
+		for k,v in npairs(tbl) do
+			if type(v) == 'table' then
+				ret = ret..k..'='..dump(v)..",\n"
+			else
+				ret = ret..k..'='..tostring(v)..",\n"
+			end
+		end
+	end
+	return ret..'}'
+end
+
 ---get map table keys
 function keys(tbl)
 	local ret = {}
 	if #tbl == 0 then
-		for k,_ in paris(tbl) do
+		for k,_ in pairs(tbl) do
 			table.insert(ret, k)
 		end
 	else
-		for i, _ in iparis(tbl) do
+		for i, _ in ipairs(tbl) do
 			table.insert(ret, i)
 		end
 	end
 	return ret
 end
-
-

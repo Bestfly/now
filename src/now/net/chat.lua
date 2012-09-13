@@ -37,7 +37,7 @@ local function _do_send(self, cmd)
     	if not data then
         	ngx.log(ngx.ERR, "can not get rec msg")
     	end
-    	return _md5.json_decode(data)
+    	return _base.json_decode(data)
     end
 end
 

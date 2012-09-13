@@ -1,25 +1,33 @@
----simple template compiled module
+---一个简单的模板引擎。只支持lua语法和{{变量}}的替换
 module("now.tpl", package.seeall)
 
----get result string from template file
---@param    tpl   string  template file name. also is a lua module
---@param    key   string  the key of the lua module
---@param    data  table   data for compiled
---@author   outrace@gmail.com
+local _tplFun = {}
+
+---根据输入参数得到结果
+--@param #string tpl 模板文件名称
+--@param #string key 模板的key
+--@param #table data 输入参数
+--@return #string 内容结果
 function tpl(tpl, key, data)
-    local mdl = require("app.tpl."..site)
-    local tpl = mdl[key]
-    local ret = tpl
-    
-    for k in pairs(data) do
-        if type(data[k]) == "string" then
-            ret = string.gsub(ret,"{"..k.."}", data[k])
-        else
-            for kk in pairs(data[k]) do
-                ret = string.gsub(ret,"{"..k.."."..kk.."}", data[k][kk])
-            end
-        end
-    end
-    
-    return ret
+	tpl = ngx.ctx.request.game..'.tpl.'..tpl
+	local ck = tpl..'_'..key
+	
+	if _tplFun[ck] == nil then
+	    local mdl = require(tpl)
+	    if mdl == nil or mdl[key] == nil then
+	    	error('tpl not exist tpl='..tpl..' key='..key)
+	    end
+	    local tstr = mdl[key]
+	    
+	    --只支持3种语法  <!--{ lua语法 }-->  {{替换内容}}
+		local str = "local args = {...}\nlocal data = args[1]\nstr=[[\n"
+		tstr = string.gsub(tstr, "<!%-%-{", "]]")
+		tstr = string.gsub(tstr, "}%-%->", "\nstr=str..[[")
+		tstr = string.gsub(tstr, "{{", "]]\nstr=str..")
+		tstr = string.gsub(tstr, "}}", "\nstr=str..[[")
+		str = str..tstr.."\n]]\nreturn str"
+		_tplFun[ck] = loadstring(str)
+	end
+	
+	return _tplFun[ck](data)
 end

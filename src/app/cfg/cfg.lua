@@ -2,6 +2,7 @@
 local error = error
 local pairs = pairs
 module('app.cfg.cfg')
+
 local data={
 dev = {
 suf = ".do",  --后缀
