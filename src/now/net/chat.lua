@@ -1,4 +1,4 @@
----simple chat client, support group message and p2p message
+---simple chat client, support group boardcast and p2p message
 module("now.net.chat", package.seeall)
 
 local _cls = now.net.chat

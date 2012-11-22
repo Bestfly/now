@@ -3,7 +3,7 @@ module("now.util.time",package.seeall)
 local base = require("now.base")
 
 local _dis = {
-w=3600*24*7, d=3600*24, h=3600, m=60, s=1
+	w=3600*24*7, d=3600*24, h=3600, m=60, s=1
 }
 
 ---计算时间间隔的秒数
@@ -94,4 +94,3 @@ function get_time(date)
     end
     return os.time(tbl)
 end
-

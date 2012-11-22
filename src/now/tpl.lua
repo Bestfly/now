@@ -1,5 +1,5 @@
 ---一个简单的模板引擎。只支持lua语法和{{变量}}的替换
-module("now.tpl", package.seeall)
+module(...)
 
 local _tplFun = {}
 

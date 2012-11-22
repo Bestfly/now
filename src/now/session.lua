@@ -1,13 +1,13 @@
----simple session
-module("now.session", package.seeall)
-
-local _cls = now.session
-local _mt = {__index = _cls}
 local _tbl = require("now.util.tbl")
 local _base = require("now.base")
 local _md5 = ngx.md5
 local _encode_base64 = ngx.encode_base64
 local _decode_base64 = ngx.decode_base64
+
+---simple session
+module("...")
+
+local _mt = { __index = _M }
 
 ---传入'_key' 作为密钥
 function new(self, o)
@@ -64,6 +64,9 @@ function clear(self)
 	self._data = {}
 end
 
-getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
-end
+local _class_mt = {
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable "' .. key .. '"')
+    end
+}
+setmetatable(_M, _class_mt)

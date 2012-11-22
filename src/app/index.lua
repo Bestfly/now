@@ -9,7 +9,7 @@ setmetatable(_G, {
     end,
 })
 
-local control = require("now.control")
+local control = require "now.control"
 local flag, msg = pcall(control.execute)
 if flag == false then
 	ngx.say(msg)

@@ -1,9 +1,12 @@
----Kyoto Tycoon http client。  only rpc protocal support
-module("now.net.kt", package.seeall)
-
 local _cls = now.net.kt
 local _mt = { __index = _cls }
 local _http = require("now.net.http")
+local _decode_args = ngx.decode_args
+
+---Kyoto Tycoon http client。  only rpc protocal support
+module(...)
+
+
 local _commands = {
 'void', 	'echo', 	'report', 	'play_script',
 'tune_replication', 	'status', 	'clear', 	'synchronize',
@@ -28,7 +31,7 @@ end
 
 local function _read_reply(data)
 	if ret.code == 200 and #ret.body > 0 then
-		ret.body = ngx.decode_args(ret.body)
+		ret.body = _decode_args(ret.body)
 	end
 	return ret
 end
