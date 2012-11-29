@@ -1,7 +1,6 @@
-local _cls = now.net.kt
-local _mt = { __index = _cls }
-local _http = require("now.net.http")
-local _decode_args = ngx.decode_args
+local http = require 'now.net.http'
+local decode_args = ngx.decode_args
+local setmetatable = setmetatable
 
 ---Kyoto Tycoon http client。  only rpc protocal support
 module(...)
@@ -22,16 +21,16 @@ local _commands = {
 ---初始化，需包含的参数为 {host='',port=''}
 function new(self, o)
 	o = o || {
-		host = "127.0.0.1",
+		host = '127.0.0.1',
 		port = 1978
 	}
-	o['http'] = _http:new()
+	o['http'] = http:new()
     return setmetatable(o, _mt)
 end
 
 local function _read_reply(data)
 	if ret.code == 200 and #ret.body > 0 then
-		ret.body = _decode_args(ret.body)
+		ret.body = decode_args(ret.body)
 	end
 	return ret
 end
@@ -54,5 +53,5 @@ for i, cmd in iparis(_commands) do
 end
 
 getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
+    error('attempt to write to undeclared variable [' .. key .. ']: '.. debug.traceback())
 end

@@ -1,9 +1,10 @@
----简单的http客户端。支持get/post/head/delete/put这几种method。其他不支持
-module("now.net.http", package.seeall)
+local tcp = ngx.socket.tcp
+local gsub = string.gsub
+local find = string.find
+local pairs = pairs
 
-local _tcp = ngx.socket.tcp
-local _base = require("now.base")
-local _tbl = require("now.util.tbl")
+---简单的http客户端。支持get/post/head/delete/put这几种method。其他不支持
+module(...)
 
 local _cfg = {
 	timeout = 1000,		--连接超时，默认1秒
@@ -41,33 +42,33 @@ local function _getUri(url)
     end
     
     -- remove whitespace
-    -- url = string.gsub(url, "%s", "")
+    -- url = gsub(url, "%s", "")
     -- get fragment
-    url = string.gsub(url, "#(.*)$", function(f)
+    url = gsub(url, "#(.*)$", function(f)
         parsed.fragment = f
         return ""
     end)
     
     -- get scheme
-    url = string.gsub(url, "^([%w][%w%+%-%.]*)%:", function(s) 
+    url = gsub(url, "^([%w][%w%+%-%.]*)%:", function(s) 
     	parsed.scheme = s
     	return ""
     end)
         
     -- get authority
-    url = string.gsub(url, "^//([^/]*)", function(n)
+    url = gsub(url, "^//([^/]*)", function(n)
         parsed.authority = n
         return ""
     end)
     
     -- get query stringing
-    url = string.gsub(url, "%?(.*)", function(q)
+    url = gsub(url, "%?(.*)", function(q)
         parsed.query = q
         return ""
     end)
     
     -- get params
-    url = string.gsub(url, "%;(.*)", function(p)
+    url = gsub(url, "%;(.*)", function(p)
         parsed.params = p
         return ""
     end)
@@ -85,12 +86,12 @@ local function _getUri(url)
     	return parsed 
     end
     
-    authority = string.gsub(authority,"^([^@]*)@", function(u) 
+    authority = gsub(authority,"^([^@]*)@", function(u) 
 	    parsed.userinfo = u
 	    return "" 
     end)
     
-    authority = string.gsub(authority, ":([^:]*)$", function(p) 
+    authority = gsub(authority, ":([^:]*)$", function(p) 
     	parsed.port = p
 		return ""
 	end)
@@ -107,7 +108,7 @@ local function _getUri(url)
     	return parsed
     end
     
-    userinfo = string.gsub(userinfo, ":([^:]*)$", function(p) 
+    userinfo = gsub(userinfo, ":([^:]*)$", function(p) 
     	parsed.password = p
     	return ""
     end)
@@ -192,7 +193,7 @@ local function _readHttpHead(sock)
 	end
 	
     while line ~= "" do
-    	_, _, name, value = string.find(line, "^(.-):%s*(.*)")
+    	_, _, name, value = find(line, "^(.-):%s*(.*)")
     	if not (name and value) then
 			return nil, "unknown response header name and value"
     	end
@@ -202,7 +203,7 @@ local function _readHttpHead(sock)
 		if err then
 			return nil,err
 		end
-    	while string.find(line, "^%s") do
+    	while find(line, "^%s") do
     		value = value .. line
     	    line, err, partial = sock:receive()
 			if err then
@@ -227,7 +228,7 @@ end
 local function _fetchResult(method, host, port, str)
 	local ret = {code=200, header={}, body=''}
 	
-	local sock = _tcp()
+	local sock = tcp()
 	if not sock then
 		return nil,nil,nil, "error to init tcp"
 	end
@@ -253,7 +254,7 @@ local function _fetchResult(method, host, port, str)
     	sock:close()
 		return nil,nil,nil, "failed to read the data stream: "..err
     end
-    local _, _, code = string.find(data, "HTTP/%d*%.%d* (%d%d%d)")
+    local _, _, code = find(data, "HTTP/%d*%.%d* (%d%d%d)")
     
     --得到返回状态吗
     code = tonumber(code)

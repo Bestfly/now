@@ -1,3 +1,8 @@
+local ngx = ngx
+local require = require
+local error = error
+local gsub = string.gsub
+
 ---一个简单的模板引擎。只支持lua语法和{{变量}}的替换
 module(...)
 
@@ -13,7 +18,7 @@ function tpl(tpl, key, data)
 	local ck = tpl..'_'..key
 	
 	if _tplFun[ck] == nil then
-	    local mdl = require(tpl)
+	    local mdl = _require(tpl)
 	    if mdl == nil or mdl[key] == nil then
 	    	error('tpl not exist tpl='..tpl..' key='..key)
 	    end
@@ -21,10 +26,10 @@ function tpl(tpl, key, data)
 	    
 	    --只支持3种语法  <!--{ lua语法 }-->  {{替换内容}}
 		local str = "local args = {...}\nlocal data = args[1]\nstr=[[\n"
-		tstr = string.gsub(tstr, "<!%-%-{", "]]")
-		tstr = string.gsub(tstr, "}%-%->", "\nstr=str..[[")
-		tstr = string.gsub(tstr, "{{", "]]\nstr=str..")
-		tstr = string.gsub(tstr, "}}", "\nstr=str..[[")
+		tstr = gsub(tstr, "<!%-%-{", "]]")
+		tstr = gsub(tstr, "}%-%->", "\nstr=str..[[")
+		tstr = gsub(tstr, "{{", "]]\nstr=str..")
+		tstr = gsub(tstr, "}}", "\nstr=str..[[")
 		str = str..tstr.."\n]]\nreturn str"
 		_tplFun[ck] = loadstring(str)
 	end

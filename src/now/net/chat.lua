@@ -1,18 +1,18 @@
----simple chat client, support group boardcast and p2p message
-module("now.net.chat", package.seeall)
+local tcp = ngx.socket.tcp
+local random = math.random
+local md5 = ngx.md5
+local base = require("now.base")
 
-local _cls = now.net.chat
+---simple chat client, support group boardcast and p2p message
+module(...)
+
 local _mt = { __index = _cls}
-local _tcp = ngx.socket.tcp
 local _idle_time = 8000
 local _conn_pool_size = 100
-local _random = math.random
-local _md5 = ngx.md5
-local _base = require("now.base")
 
 ---初始化，需包含的参数为 {host='',port='',app='',code=''}
 function new(self, o)
-	o["sock"] = _tcp()
+	o["sock"] = tcp()
 	o["conn"] = false
 	o["rec"] = ""
     return setmetatable(o, mt)
@@ -20,7 +20,7 @@ end
 
 local function _do_send(self, cmd)
 	local sock = self.sock
-    local cmd_str = _base.json_encode(cmd)
+    local cmd_str = base.json_encode(cmd)
     local len = 100000 + #cmd_str;
     local send_msg = tostring(len)..cmd_str
     local bytes, err = sock:send(send_msg)
@@ -37,7 +37,7 @@ local function _do_send(self, cmd)
     	if not data then
         	ngx.log(ngx.ERR, "can not get rec msg")
     	end
-    	return _base.json_decode(data)
+    	return base.json_decode(data)
     end
 end
 
@@ -78,5 +78,5 @@ function close(self)
 end
 
 getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
+    error('attempt to write to undeclared variable [' .. key .. ']: '.. debug.traceback())
 end

@@ -1,9 +1,12 @@
----使用shm作为cache
-module("now.cache.shmcache",package.seeall)
+local tbl = require("now.util.tbl")
+local ngx = ngx
+local pairs = pairs
+local abs = abs
 
-local _cls = now.cache.shmcache
-local _mt = { __index = _cls}
-local _tbl = require('now.util.tbl')
+---使用shm作为cache
+module(...)
+
+local _mt = { __index = _M }
 
 ---实例化对象
 function new(self, o)
@@ -67,14 +70,14 @@ end
 ---设置
 function set(self, key, val, expired)
     expired = expired or 0
-    expired = math.abs(expired)
+    expired = abs(expired)
     self.bufList[key] = {val, expired}
 end
 
 ---批量设置一些key
 function mset(self, tbl, expired)
     expired = expired or 0
-    expired = math.abs(expired)
+    expired = abs(expired)
     
     local ret = {}
     for k, v in pairs(tbl) do
@@ -120,6 +123,11 @@ function incr(self, key, num)
 	end
 end
 
-getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
-end
+local class_mt = {
+    -- to prevent use of casual module global variables
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable [' .. key .. ']')
+    end
+}
+
+setmetatable(_M, class_mt)

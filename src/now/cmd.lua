@@ -1,9 +1,7 @@
 ---base cmd class
-module("now.cmd", package.seeall)
+local base = require("now.base")
 
-local _cls = now.cache
-local _mt = {__index = _cls}
-local _base = require("now.base")
+module(...)
 
 function new(self, o)
 end
@@ -18,5 +16,5 @@ function _ret(self, data, kind, para)
 end
 
 getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
+    error('attempt to write to undeclared variable [' .. key .. ']: '.. debug.traceback())
 end

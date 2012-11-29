@@ -1,10 +1,8 @@
-module("now.db.mongodb", package.seeall)
+local base = require 'now.base'
+local tbl = require 'now.util.tbl'
 
-local _cls = now.db.mongodb
-local _mt = { __index = _cls}
-local _base = require("now.base")
-local _mysql = require("resty.mysql")
-local _tbl = require("now.util.tbl")
+module(...)
+
 
 ---打开SQL连接
 function _open(self)
@@ -13,7 +11,7 @@ end
 ---新建一个mysql示例
 function new(self, o)
 	o = o or {}
-	_tbl.addToTbl(o, {
+	tbl.addToTbl(o, {
 		keepalive=1500,
 		timeout=4000,
 		pool=256
@@ -47,5 +45,5 @@ function execute(self, sql, para)
 end
 
 getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
+    error('attempt to write to undeclared variable [' .. key .. ']: '.. debug.traceback())
 end

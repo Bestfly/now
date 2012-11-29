@@ -1,8 +1,8 @@
----cache class
-module("now.cache",package.seeall)
+local _tbl = require 'now.util.tbl'
 
-local mt = { __index = now.cache}
-local _tbl = require("now.util.tbl")
+---cache class
+module(...)
+local _mt = { __index = _M }
 
 function new(self, o)
 	o = o or {}
@@ -10,9 +10,9 @@ function new(self, o)
 		keepalive=200,
 		timeout=1000
 	})
-	o["update_list"] = {}
-	o["delete_list"] = {}
-	o["mdls"] = {}
+	o['update_list'] = {}
+	o['delete_list'] = {}
+	o['mdls'] = {}
     return setmetatable(o, _mt)
 end
 
@@ -55,6 +55,11 @@ end
 function mdel(self, smdl, tbl)
 end
 
-getmetatable(now.cache).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
-end
+local class_mt = {
+    -- to prevent use of casual module global variables
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable [' .. key .. ']')
+    end
+}
+
+setmetatable(_M, class_mt)

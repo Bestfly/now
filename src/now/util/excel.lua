@@ -1,6 +1,6 @@
 ---simple function to import and export excel file
 --only xml format support
-module("now.util.excel", package.seeall)
+module(...)
 
 function export(data)
 	

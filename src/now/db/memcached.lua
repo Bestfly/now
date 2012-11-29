@@ -1,10 +1,11 @@
----use memcached for dao cache. need resty.memcached installed
-module("now.db.memcached",package.seeall)
+local memcached = require 'resty.memcached'
+local tbl = require 'now.util.tbl'
+local base = require 'now.base'
 
-local _cls = now.db.memcache
-local _mt = { __index = _cls}
-local _memcached = require("resty.memcached")
-local _tbl = require("now.util.tbl")
+---use memcached for dao cache. need resty.memcached installed
+module(...)
+
+local _mt = { __index = _M }
 
 function rollback(self)
 
@@ -17,7 +18,7 @@ end
 ---传递参数 {host, port, keepalive,  timeout
 function new(self, o)
 	o = o or {}
-	_tbl.add_to_tbl(o, {
+	tbl.add_to_tbl(o, {
 		keepalive=200,
 		timeout=1000
 	})
@@ -27,9 +28,9 @@ function new(self, o)
     return setmetatable(o, _mt)
 end
 
-local function _open()
+local function _open(self)
 	if self.isclose then
-		self.mem_cls = _memcached:new()
+		self.mem_cls = memcached:new()
 		self.mem_cls:set_timeout(self.timeout)
         local ok, err = self.mem_cls:connect(self.host,  self.port)
         if not ok then
@@ -75,10 +76,16 @@ function del(self, key)
 	end
 end
 
-function close()
+function close(self)
 	self.mem_cls:set_keepalive(0, self.keepalive)
 end
 
-getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
-end
+
+local class_mt = {
+    -- to prevent use of casual module global variables
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable [' .. key .. ']')
+    end
+}
+
+setmetatable(_M, class_mt)

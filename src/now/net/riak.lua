@@ -1,18 +1,18 @@
+local http = require 'now.net.http'
+local base = require 'now.base'
+local encode_args = ngx.encode_args
+local tostring = tostring
+
 ---riak http client
-module("now.net.riak", package.seeall)
+module(...)
 
-local _cls = now.net.riak
-local _mt = { __index = _cls }
-local _http = require("now.net.http")
-local _base = require("now.base")
-
----初始化，需包含的参数为 {host='',port=''}
+---para : {host='',port=''}
 function new(self, o)
 	o = o || {
 		host = "127.0.0.1",
 		port = 1978
 	}
-	o['http'] = _http:new()
+	o['http'] = http:new()
     return setmetatable(o, _mt)
 end
 
@@ -22,10 +22,11 @@ end
 function _get(self, url)
 	local ret = self.http:get(url)
 	if ret['code'] == 200 then
-		ret['body'] = _base.json_decode(ret['body'])
+		ret['body'] = base.json_decode(ret['body'])
 	end
 	return ret
 end
+
 function _put(self, url)
 	
 end
@@ -53,7 +54,7 @@ end
 
 function set_bucket(self, bucket, props)
 	local url = '/buckets/'..bucket..'/props'
-	local ret = self.http:put(url, {["Content-Length"] = "application/json"}, _base.json_encode(props))
+	local ret = self.http:put(url, {["Content-Length"] = "application/json"}, base.json_encode(props))
 	return ret
 end
 
@@ -66,10 +67,10 @@ end
 function store_object(self, bucket, key, val, para)
 	local url = '/buckets/'..bucket..'/keys/'..key
 	if para then
-		url = url .. '?' .. ngx.encode_args(para)
+		url = url .. '?' .. encode_args(para)
 	end
 	if type(val) == 'table' then
-		return self.http:put(url, {["Content-Length"] = "application/json"}, _base.json_encode(val))
+		return self.http:put(url, {["Content-Length"] = "application/json"}, base.json_encode(val))
 	else
 		return self.http:put(url, {["Content-Length"] = "text/plain"}, val)
 	end
@@ -78,7 +79,7 @@ end
 function delete_object(self, bucket, key)
 	local url = '/buckets/'..bucket..'/keys/'..key
 	if para then
-		url = url .. '?' .. ngx.encode_args(para)
+		url = url .. '?' .. encode_args(para)
 	end
 	return self.http:delete(url)
 end
@@ -107,6 +108,11 @@ end
 function index(self)
 end
 
-getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
-end
+local class_mt = {
+    -- to prevent use of casual module global variables
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable [' .. key .. ']')
+    end
+}
+
+setmetatable(_M, class_mt)

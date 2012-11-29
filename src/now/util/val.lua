@@ -1,5 +1,7 @@
+local tonumber = tonumber
+
 ---提供简单的数据验证
-module("now.util.val", package.seeall)
+module(...)
 
 
 ---内置的验证规则

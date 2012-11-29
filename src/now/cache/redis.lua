@@ -1,15 +1,14 @@
----use redis for dao cache. need resty.redis installed
-module("now.cache.redis",package.seeall)
+local redis = require("resty.redis")
+local tbl = require("now.util.tbl")
 
-local _cls = now.cache.redis
-local _mt = { __index = _cls}
-local _redis = require("resty.redis")
-local _tbl = require("now.util.tbl")
+---use redis for dao cache. need resty.redis installed
+module(...)
+local _mt = { __index = _M }
 
 --- host port
 function new(self, o)
 	o = o or {}
-	_tbl.add_to_tbl(o, {
+	tbl.add_to_tbl(o, {
 		keepalive=200,
 		timeout=1000,
 		pool = 100
@@ -19,7 +18,7 @@ end
 
 ---open socket
 function open(self)
-	self.redis_cls = _redis:new()
+	self.redis_cls = redis:new()
 	self.redis_cls:set_timeout(self.timeout)
     local ok, err = self.redis_cls:connect(self.host,  self.port)
     if err then
@@ -106,6 +105,11 @@ function close(self)
 	self.redis_cls:set_keepalive(self.keepalive,  self.pool)
 end
 
-getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
-end
+local class_mt = {
+    -- to prevent use of casual module global variables
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable [' .. key .. ']')
+    end
+}
+
+setmetatable(_M, class_mt)

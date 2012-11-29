@@ -1,8 +1,10 @@
----进行事件处理
-module("now.event", package.seeall)
+local insert = table.insert
+local ipairs = ipairs
 
-local _this = gnow.event
-_this.event = {
+---event handle
+module(...)
+
+local _event = {
 	cmd_before = {},	--命令执行前
 	cmd_after = {},		--命令执行后
 	cmd_error = {},		--错误执行前
@@ -20,20 +22,20 @@ _this.event = {
 --@param #string kind 监听的类型
 --@param #function callback 回调函数
 function register(kind, callback)
-	if _this.event[kind] == nil then
+	if _event[kind] == nil then
 		return
 	end
-	table.insert(_this.event[kind], callback)
+	insert(_event[kind], callback)
 end
 
 ---触发事件
 --@param #string kind 监听的类型
 function call(kind, ...)
-	if _this.event[kind] == nil then
+	if _event[kind] == nil then
 		return
 	end
 	
-	for _, cb in ipairs(_this.event[kind]) do
+	for _, cb in ipairs(_event[kind]) do
 		cb(...)
 	end
 end

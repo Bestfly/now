@@ -1,9 +1,9 @@
----data access object
-module("now.dao",package.seeall)
+local base = require 'now.base'
+local error = error
 
-local _cls = now.dao
-local _mt = { __index = _cls}
-local _base = require("now.base")
+---data access object
+module(...)
+local _mt = { __index = _M }
 
 function new(self, o)
 	
@@ -18,7 +18,7 @@ end
 function rollback(self)
 end
 
-function get(self, mdl, filter,  page,  order,  get_one)
+function get(self, mdl, filter,  page,  order,  getOne)
 end
 
 function mdf(self, mdl, filter, data)
@@ -30,6 +30,12 @@ end
 function find(self, mdl)
 end
 
-getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
-end
+
+local class_mt = {
+    -- to prevent use of casual module global variables
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable [' .. key .. ']')
+    end
+}
+
+setmetatable(_M, class_mt)

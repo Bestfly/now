@@ -1,5 +1,11 @@
+local pairs = pairs
+local ipairs = ipairs
+local insert = insert
+local sort = sort
+local getmetatable = getmetatable
+
 ---table相关的一些辅助函数
-module("now.util.tbl", package.seeall)
+module(...)
 
 ---检查值是否存在于table中
 --@param    tbl     table   对应的table
@@ -39,12 +45,12 @@ end
 function sortByKey(tbl)
 	local tmp = {}
 	for k in pairs(tbl) do
-		table.insert(tmp,k)
+		insert(tmp,k)
 	end
-	table.sort(tmp)
+	sort(tmp)
 	local sorted = {}
 	for i,n in ipairs(tmp) do
-		table.insert(sorted,n)
+		insert(sorted,n)
 	end
 	return sorted
 end
@@ -62,7 +68,7 @@ function mapToArr(tbl, key)
     for k in pairs(tbl) do
         local v = tbl[k]
         v[key] = k
-        table.insert(newt,v)
+        insert(newt,v)
     end
     return newt
 end
@@ -171,11 +177,11 @@ function keys(tbl)
 	local ret = {}
 	if #tbl == 0 then
 		for k,_ in pairs(tbl) do
-			table.insert(ret, k)
+			insert(ret, k)
 		end
 	else
 		for i, _ in ipairs(tbl) do
-			table.insert(ret, i)
+			insert(ret, i)
 		end
 	end
 	return ret

@@ -1,5 +1,5 @@
 ---the main contoler
-module("now.control", package.seeall)
+module(...)
 
 local _base = require("now.base")
 local _dao = require("now.dao")

@@ -1,18 +1,17 @@
-local _tbl = require("now.util.tbl")
-local _base = require("now.base")
-local _md5 = ngx.md5
-local _encode_base64 = ngx.encode_base64
-local _decode_base64 = ngx.decode_base64
+local base = require("now.base")
+local md5 = ngx.md5
+local encodebase64 = ngx.encodebase64
+local decodebase64 = ngx.decodebase64
 
 ---simple session
-module("...")
+module(...)
 
 local _mt = { __index = _M }
 
 ---传入'_key' 作为密钥
 function new(self, o)
 	if not o or o['_key'] == nil then
-		_base.err('can not new session instance without _key')
+		base.err('can not new session instance without _key')
 	end
 	o._data = {}
 	o.change = false
@@ -21,24 +20,24 @@ end
 
 ---得到session数据，格式为rand|key|base64(json_data)
 --key = md5(rand..data..key)
-function init_data(self, str)
-	local arr = _base.split('|', str)
+function init(self, str)
+	local arr = base.split('|', str)
 	if #arr ~= 3 then
-		_base.err('init session error')
+		base.err('init session error')
 	end
-	local key = _md5(arr[1]..self_key..arr[3])
+	local key = md5(arr[1]..self_key..arr[3])
 	if key ~= arr[2] then
-		_base.err('session key error')
+		base.err('session key error')
 	end
-	self._data = _decode_base64(_base.json_decode(arr[3]))
+	self._data = decodebase64(base.json_decode(arr[3]))
 end
 
 ---得到新的session字符串
-function get_session_str(self)
+function save(self)
 	local rand = tostring(ngx.now * 1000)
-	local data = _encode_base64(_base.json_encode(self._data))
-	local key = _md5(rand..'|'..self_key..'|'..data)
-	return rand..'|'..key..'|'..data
+	local data = encodebase64(base.json_encode(self._data))
+	local key = md5(rand..'|'..self_key..'|'..data)
+	local str = rand..'|'..key..'|'..data
 end
 
 --- get session data by key
@@ -66,7 +65,7 @@ end
 
 local _class_mt = {
     __newindex = function (table, key, val)
-        error('attempt to write to undeclared variable "' .. key .. '"')
+        error('attempt to write to undeclared variable [' .. key .. ']')
     end
 }
 setmetatable(_M, _class_mt)
