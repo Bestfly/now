@@ -1,5 +1,4 @@
 local insert = table.insert
-local ipairs = ipairs
 
 ---event handle
 module(...)
@@ -35,7 +34,9 @@ function call(kind, ...)
 		return
 	end
 	
-	for _, cb in ipairs(_event[kind]) do
-		cb(...)
+	local ks = #_event[kind]
+	
+	for i = 1, ks do
+		_event[kind][i](...)
 	end
 end

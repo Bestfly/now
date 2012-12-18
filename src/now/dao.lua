@@ -1,5 +1,6 @@
 local base = require 'now.base'
 local error = error
+local setmetatable = setmetatable
 
 ---data access object
 module(...)
@@ -30,6 +31,8 @@ end
 function find(self, mdl)
 end
 
+function random(self, mdl, tbl)
+end
 
 local class_mt = {
     -- to prevent use of casual module global variables

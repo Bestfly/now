@@ -1,28 +1,32 @@
 ---the main contoler
-module(...)
+local base = require 'now.base'
+local log = require 'now.log'
+local dao = require 'now.dao'
+local session = require 'now.session'
+local cache = require 'now.cache'
+local sub = string.sub
 
-local _base = require("now.base")
-local _dao = require("now.dao")
-local _session = require("now.session")
-local _cache = require("now.cache")
+module(...)
 
 ---main flow
 function execute()
-	local uri = string.sub(ngx.var.uri, 0, -(#suf+1))
+	local uri = sub(ngx.var.uri, 0, -(#suf+1))
 	local arr = base.split(uri,"/") --/app/mdl/method.do
 
 	--['应用名','模块名','方法名']
 	
-	ngx.ctx["dao"]= _dao:new{
+	ngx.ctx["dao"]= dao:new{
 	}
-	ngx.ctx["cache"] = _cache:new{
+	
+	ngx.ctx["cache"] = cache:new{
 	}
-	ngx.ctx["session"] = _session:new{
+	
+	ngx.ctx["session"] = session:new{
 	}
 
 	local flag,msg = pcall(fw.execute)
 	if flag == false then
 		ngx.say("system error")
-		ngx.log(ngx.ERR,msg)
+		log.err(msg)
 	end
 end

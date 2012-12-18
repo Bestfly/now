@@ -1,5 +1,5 @@
-local redis = require("resty.redis")
-local tbl = require("now.util.tbl")
+local redis = require 'resty.redis'
+local tbl = require 'now.util.tbl'
 
 ---use redis for dao cache. need resty.redis installed
 module(...)
@@ -22,7 +22,7 @@ function open(self)
 	self.redis_cls:set_timeout(self.timeout)
     local ok, err = self.redis_cls:connect(self.host,  self.port)
     if err then
-    	return false , "error to connet redis err="..err
+    	return false , 'error to connet redis err='..err
     else
     	return true
     end
@@ -32,7 +32,7 @@ function get(self, key)
 	if self.redis_cls ~= nil then
 		local res, err = self.redis_cls:get(key)
 	    if err then
-	    	return nil, "error to get data. err="..err
+	    	return nil, 'error to get data. err='..err
 	    end
 	    if not res then
 			return nil
@@ -40,19 +40,25 @@ function get(self, key)
 			return res
 	    end
 	else
-		return false, "conn is not exist"
+		return false, 'conn is not exist'
 	 end
 end
 
 function mget(self, keys)
 	if self.redis_cls ~= nil then
 		local ret = {}
-		for _, k in ipairs(keys) do
-			ret[k] = self.redis_cls:get(k)
+		local nkeys = #keys
+		
+		if nkeys == 0 then
+			return ret
+		end
+		
+		for i=1, nkeys do
+			ret[k] = self.redis_cls:get(keys[i])
 		end
 		return ret
 	else
-		return false, "conn is not exist"
+		return false, 'conn is not exist'
 	 end
 end
 
@@ -69,7 +75,7 @@ function mset(self, tbl, expired)
 		end
 		return true
 	else
-		return false, "conn is not exist"
+		return false, 'conn is not exist'
 	end
 end
 
@@ -77,18 +83,20 @@ function del(self, key)
 	if self.redis_cls ~= nil then
 		return self.redis_cls:del(key)
 	else
-		return false, "conn is not exist"
+		return false, 'conn is not exist'
 	end
 end
 
-function mdel(self, tbl)
+function mdel(self, keys)
 	if self.redis_cls ~= nil then
-		for _, v in ipairs(tbl) do
-			self.redis_cls:del(key)
+		local nkeys = #keys
+		
+		for i=1, nkeys do
+			self.redis_cls:del(keys[i])
 		end
 		return true
 	else
-		return false, "conn is not exist"
+		return false, 'conn is not exist'
 	end
 end
 
@@ -97,7 +105,7 @@ function incr(self, key, num)
 	if self.redis_cls ~= nil then
 		return self.redis_cls:incrby(key, num)
 	else
-		return false, "conn is not exist"
+		return false, 'conn is not exist'
 	end
 end
 

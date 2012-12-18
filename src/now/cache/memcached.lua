@@ -5,6 +5,7 @@ local paris = pairs
 
 ---use memcached for dao cache. need resty.memcached installed
 module(...)
+
 local _mt = { __index = _M }
 
 ---传递参数 {host, port, keepalive,  timeout}

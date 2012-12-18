@@ -1,4 +1,4 @@
-local base = require("now.base")
+local base = require 'now.base'
 local md5 = ngx.md5
 local encodebase64 = ngx.encodebase64
 local decodebase64 = ngx.decodebase64
@@ -68,4 +68,5 @@ local _class_mt = {
         error('attempt to write to undeclared variable [' .. key .. ']')
     end
 }
+
 setmetatable(_M, _class_mt)

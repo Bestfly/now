@@ -1,4 +1,4 @@
-local cjson = require 'cjson'
+local require = require
 local len = string.len
 local sub = string.sub
 local insert = table.insert
@@ -7,17 +7,37 @@ local ngx = ngx
 ---now frmamework base module
 module(...)
 --cjson.encode_sparse_array(true)
+local json = nil
+
+---get json module
+local function _get_json()
+	local _cjson = function()
+		json = require 'cjson'
+	end
+	if not json then
+		pcall(_cjson)
+		if not json then
+			json = require 'util.dkjson'
+		end
+	end
+end
 
 ---encode table to json string
 --@param #table tbl table will be encode
 function json_encode(tbl)
-	return cjson.encode(tbl)
+	if not json then
+		_get_json()
+	end
+	return json.encode(tbl)
 end
 
 ---get table from json string
 --@param #string str json string
 function json_decode(str)
-	return cjson.decode(str)
+	if not json then
+		_get_json()
+	end
+	return json.decode(str)
 end
 
 ---simple string split funciton. will replace by ngx.re.split later

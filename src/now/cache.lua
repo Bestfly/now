@@ -1,4 +1,5 @@
-local _tbl = require 'now.util.tbl'
+local tbl = require 'now.util.tbl'
+local setmetatable = setmetatable
 
 ---cache class
 module(...)
@@ -6,7 +7,7 @@ local _mt = { __index = _M }
 
 function new(self, o)
 	o = o or {}
-	_tbl.add_to_tbl(o, {
+	tbl.add_to_tbl(o, {
 		keepalive=200,
 		timeout=1000
 	})

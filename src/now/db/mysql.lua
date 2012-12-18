@@ -1,14 +1,19 @@
+local pairs = pairs
+local gsub = string.gsub
+local type = type
+local error = error
+
+local base = require 'gnow.base'
+local mysql = require 'resty.mysql'
+local tbl = require 'gnow.util.tbl'
+
 ---mysql数据库连接及请求的封装
 --@author 		欧远宁
 --@copyright 	欧远宁
 --@version 		1.0
 module(...)
 
-local _cls = gnow.mysql
-local _mt = { __index = _cls}
-local _base = require("gnow.base")
-local _mysql = require("resty.mysql")
-local _tbl = require("gnow.util.tbl")
+local _mt = { __index = _M }
 
 ---根据SQL和对应参数，重新生成SQL。避免SQL注入
 --@function [parent=#gnow.mysql] _buildSql
@@ -21,7 +26,7 @@ local function _buildSql(sql, para)
 				para[k] = "'"..v.."'"
 			end
 		end
-		sql = string.gsub(sql, "%$(%w+)", para)
+		sql = gsub(sql, "%$(%w+)", para)
 	end
 	return sql
 end
@@ -30,7 +35,7 @@ end
 --@function [parent=#gnow.mysql] _open
 local function _open(self)
 	if self._open == false then
-		local db = _mysql:new()
+		local db = mysql:new()
 		db:set_timeout(self.timeout) -- 1 sec
 		
 		local cfg = self.dbCfg
@@ -67,7 +72,7 @@ end
 --@param #table o 初始化参数，比如包含_dbCfg这个参数
 function new(self, o)
 	o = o or {}
-	_tbl.addToTbl(o, {
+	tbl.addToTbl(o, {
 		keepalive=1500,
 		timeout=4000,
 		pool=256
@@ -99,7 +104,6 @@ function commit(self)
 			error("can not commit err="..err)
 		end
 	end
-	--self.db:close()
 	self.db:set_keepalive(self.keepalive, self.pool)
 end
 
@@ -111,7 +115,6 @@ function rollback(self)
 		--if not res then
 		--end
 	end
-	--self.db:close()
 	self.db:set_keepalive(self.keepalive, self.pool)
 end
 
@@ -123,7 +126,6 @@ end
 function query(self, sql, para)
 	self:_open()
 	sql = _buildSql(sql, para)
-	ngx.say(sql)
 	local res, err, errno, sqlstate = self.db:query(sql)
 	if not res then
 		error("query sql err="..err.." sql="..sql)
@@ -149,6 +151,11 @@ function execute(self, sql, para)
 	end
 end
 
-getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable "' .. key .. '": '.. debug.traceback())
-end
+local class_mt = {
+    -- to prevent use of casual module global variables
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable [' .. key .. ']')
+    end
+}
+
+setmetatable(_M, class_mt)

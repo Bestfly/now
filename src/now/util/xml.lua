@@ -17,7 +17,7 @@ local function _parseargs (s)
   return arg
 end
 
-function xml2table (s)
+function toTable (s)
   local stack = {n=0}
   local top = {n=0}
   insert(stack, top)
@@ -58,7 +58,7 @@ function xml2table (s)
   return stack[1]
 end
 
-function table2xml(tbl, root)
+function fromTable(tbl, root)
 	root = root or '<root>'
 	
 	if type(tbl) ~= 'table' then

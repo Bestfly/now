@@ -1,5 +1,7 @@
 local base = require 'now.base'
 local tpl = require 'now.tpl'
+local xml = require 'now.util.xml'
+local excel = require 'now.util.excel'
 local ngx = ngx
 
 ---view

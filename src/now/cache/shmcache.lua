@@ -1,9 +1,9 @@
-local tbl = require("now.util.tbl")
+local tbl = require 'now.util.tbl'
 local ngx = ngx
 local pairs = pairs
 local abs = abs
 
----使用shm作为cache
+---use ngx.shared for cache
 module(...)
 
 local _mt = { __index = _M }

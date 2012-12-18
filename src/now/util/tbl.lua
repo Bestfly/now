@@ -49,8 +49,9 @@ function sortByKey(tbl)
 	end
 	sort(tmp)
 	local sorted = {}
-	for i,n in ipairs(tmp) do
-		insert(sorted,n)
+	
+	for i = 1, #tmp do
+		insert(sorted, tmp[i])
 	end
 	return sorted
 end
@@ -107,16 +108,16 @@ end
 --			local tbl2 = {{k1="v1",k2="v2"},{k1="vv1",k2="vv2"}}<br/>
 --			mdl.mv_tbl_field(tbl2,{"k1"})
 --@return   void
-function mvFields(tbl,fields)
+function mvFields(tbl, fields)
     if #tbl == 0 then --一般空的table和hash的table都会返回0
         for f in pairs(fields) do
             tbl[f] = nil
         end
     else
-        for i,k in ipairs(tbl) do
-            for f in pairs(fields) do
-                tbl[i][f] = nil
-            end
+        for i = 1, #tbl do
+        	for j = 1, #fields do
+        		tbl[i][fields[j]] = nil
+        	end
         end
     end
 end
@@ -129,7 +130,7 @@ function fetchFields(tbl, fields)
             ret[f] = tbl[f]
         end
 	else
-		for i, k in ipairs(tbl) do
+		for i = 1, pairs(tbl) do
 			ret[i] = {}
 			for f in pairs(fields) do
 				ret[i][f] = k[f]
