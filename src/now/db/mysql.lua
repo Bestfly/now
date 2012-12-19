@@ -5,7 +5,7 @@ local error = error
 
 local base = require 'gnow.base'
 local mysql = require 'resty.mysql'
-local tbl = require 'gnow.util.tbl'
+local tbl = require 'now.util.tbl'
 
 ---mysql数据库连接及请求的封装
 --@author 		欧远宁

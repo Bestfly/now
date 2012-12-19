@@ -7,14 +7,6 @@ module(...)
 
 local _mt = { __index = _M }
 
-function rollback(self)
-
-end
-
-function commit(self)
-
-end
-
 ---传递参数 {host, port, keepalive,  timeout
 function new(self, o)
 	o = o or {}
@@ -26,6 +18,14 @@ function new(self, o)
 	o["delete_list"] = {}
 	o["isclose"] = true
     return setmetatable(o, _mt)
+end
+
+function rollback(self)
+
+end
+
+function commit(self)
+
 end
 
 local function _open(self)
@@ -79,7 +79,6 @@ end
 function close(self)
 	self.mem_cls:set_keepalive(0, self.keepalive)
 end
-
 
 local class_mt = {
     -- to prevent use of casual module global variables

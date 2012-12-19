@@ -3,11 +3,12 @@ local setmetatable = setmetatable
 
 ---cache class
 module(...)
+
 local _mt = { __index = _M }
 
 function new(self, o)
 	o = o or {}
-	tbl.add_to_tbl(o, {
+	tbl.addToTbl(o, {
 		keepalive=200,
 		timeout=1000
 	})
@@ -29,31 +30,65 @@ function _close(self)
 	end
 end
 
+---commit
 function commit(self)
 	self:_close()
 end
 
+---rollback
 function rollback(self)
 	self:_close()
 end
 
+---get cache value by key
+--@param #string mdl module name
+--@param #string key cache key
 function get(self, mdl, key)
-	
+	local ins = self._get_mdl(mdl)
+	return ins.get(key)
 end
 
+---get values by keys
+--@param #string mdl module name
+--@param #table keys cache keys
 function mget(self, mdl, keys)
+	local ins = self._get_mdl(mdl)
+	return ins.mget(keys)
 end
 
+---set cache value by key
+--@param #string mdl module name
+--@param #string key cache key
+--@param #string val cache value string
+--@param #int expired expired time(second)
 function set(self, mdl, key, val, expired)
+	local ins = self._get_mdl(mdl)
+	return ins.set(key, val, expired)
 end
 
+---set cache value from map table
+--@param #string mdl module name
+--@param #table tbl cache table(k/v map)
+--@param #int expired expired time(second)
 function mset(self, mdl, tbl, expired)
+	local ins = self._get_mdl(mdl)
+	return ins.mset(tbl, expired)
 end
 
+---del the cache key
+--@param #string mdl module name
+--@param #string key cache key will be deleted
 function del(self, mdl, key)
+	local ins = self._get_mdl(mdl)
+	return ins.del(key)
 end
 
-function mdel(self, smdl, tbl)
+---del cache from table
+--@param #string mdl module name
+--@param #table tbl key list
+function mdel(self, mdl, tbl)
+	local ins = self._get_mdl(mdl)
+	return ins.mdel(tbl)
 end
 
 local class_mt = {

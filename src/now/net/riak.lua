@@ -6,6 +6,8 @@ local tostring = tostring
 ---riak http client
 module(...)
 
+local _mt = { __index = _M }
+
 ---para : {host='',port=''}
 function new(self, o)
 	o = o || {

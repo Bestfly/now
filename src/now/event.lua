@@ -17,7 +17,7 @@ local _event = {
 	data_del_after = {}			--删除发生后
 }
 
----注册事件监听
+---register event listener
 --@param #string kind 监听的类型
 --@param #function callback 回调函数
 function register(kind, callback)
@@ -27,8 +27,8 @@ function register(kind, callback)
 	insert(_event[kind], callback)
 end
 
----触发事件
---@param #string kind 监听的类型
+---call e
+--@param #string kind event type
 function call(kind, ...)
 	if _event[kind] == nil then
 		return

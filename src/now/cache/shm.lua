@@ -8,14 +8,14 @@ module(...)
 
 local _mt = { __index = _M }
 
----实例化对象
+---new instance {dict=''}
 function new(self, o)
 	o = o or {}
-	_tbl.addToTbl(o, {
-		_dict = "dao"
+	tbl.addToTbl(o, {
+		dict = 'dao'
 	})
-	if ngx.shared[o._dict] == nil then
-		error("ngx.shared."..o['dict'].." is not exist")
+	if ngx.shared[o.dict] == nil then
+		error('ngx.shared.'..o['dict']..' is not exist')
 	end
 	o.bufList = {}
 	o.delList = {}
@@ -23,25 +23,8 @@ function new(self, o)
     return setmetatable(o, _mt)
 end
 
----提交
-function commit(self)
-	for k,v in pairs(self.bufList) do
-		if v[2] > -1 then
-    		self.shm:set(k, v[1], v[2])
-		end
-	end
-	
-	for k,v in pairs(self.delList) do
-		self.shm:delete(k)
-	end
-end
-
----回滚
-function rollback(self)
-	--do nothing
-end
-
----根据key得到cache
+---get cache value by key
+--@param #string key cache key
 function get(self, key)
 	if self.bufList[key] ~= nil then
 		return self.bufList[key][2]
@@ -56,7 +39,8 @@ function get(self, key)
 	end
 end
 
----批量获取
+---get values by keys
+--@param #table keys cache keys
 function mget(self, keys)
 	local ret = {}
 	local val
@@ -67,14 +51,19 @@ function mget(self, keys)
 	return ret
 end
 
----设置
+---set cache value by key
+--@param #string key cache key
+--@param #string val cache value string
+--@param #int expired expired time(second)
 function set(self, key, val, expired)
     expired = expired or 0
     expired = abs(expired)
     self.bufList[key] = {val, expired}
 end
 
----批量设置一些key
+---set cache value from map table
+--@param #table tbl cache table(k/v map)
+--@param #int expired expired time(second)
 function mset(self, tbl, expired)
     expired = expired or 0
     expired = abs(expired)
@@ -86,19 +75,23 @@ function mset(self, tbl, expired)
     return ret
 end
 
----删除某个key
+---del the cache key
+--@param #string key cache key will be deleted
 function del(self, key)
    	self.delList[key] = 0
 end
 
----批量删除一些key
+---del cache from table
+--@param #table tbl key list
 function mdel(self, tbl)
     for _, k in pairs(tbl) do
    		self.delList[k] = 0
     end
 end
 
----进行自增操作
+---inc
+--@param #string key cache key
+--@param #int num incr number
 function incr(self, key, num)
 	num = num or 1
 	local bk = self.bufList[key]

@@ -1,7 +1,9 @@
 local base = require 'now.base'
 local md5 = ngx.md5
+local tostring = tostring
 local encodebase64 = ngx.encodebase64
 local decodebase64 = ngx.decodebase64
+local ngx = ngx
 
 ---simple session
 module(...)

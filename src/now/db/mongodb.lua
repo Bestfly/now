@@ -3,12 +3,11 @@ local tbl = require 'now.util.tbl'
 
 module(...)
 
-
----打开SQL连接
+---
 function _open(self)
 end
 
----新建一个mysql示例
+---
 function new(self, o)
 	o = o or {}
 	tbl.addToTbl(o, {
@@ -44,6 +43,11 @@ end
 function execute(self, sql, para)
 end
 
-getmetatable(_cls).__newindex = function (table, key, val)
-    error('attempt to write to undeclared variable [' .. key .. ']: '.. debug.traceback())
-end
+local class_mt = {
+    -- to prevent use of casual module global variables
+    __newindex = function (table, key, val)
+        error('attempt to write to undeclared variable [' .. key .. ']')
+    end
+}
+
+setmetatable(_M, class_mt)

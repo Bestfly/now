@@ -8,7 +8,7 @@ module(...)
 
 local _mt = { __index = _M }
 
----传递参数 {host, port, keepalive,  timeout}
+---new instance {host, port, keepalive,  timeout}
 function new(self, o)
 	o = o or {}
 	tbl.add_to_tbl(o, {
@@ -117,7 +117,9 @@ function mdel(self, tbl)
 	if self.mem_cls ~= nil then
 		local ret = {}
 		local err, flag, ret_err
-		for _,key in iparis(tbl) do
+		local len = #tbl
+		for i = 1, len do
+			local key = tbl[i]
 			local ok, err = self.mem_cls:delete(key)
 			if err then
 				self.mem_cls  = nil

@@ -1,8 +1,11 @@
 local redis = require 'resty.redis'
 local tbl = require 'now.util.tbl'
+local setmetatable = setmetatable
+local pairs = pairs
 
 ---use redis for dao cache. need resty.redis installed
 module(...)
+
 local _mt = { __index = _M }
 
 --- host port
@@ -28,6 +31,8 @@ function open(self)
     end
 end
 
+---get cache value by key
+--@param #string key cache key
 function get(self, key)
 	if self.redis_cls ~= nil then
 		local res, err = self.redis_cls:get(key)
@@ -44,6 +49,8 @@ function get(self, key)
 	 end
 end
 
+---get values by keys
+--@param #table keys cache keys
 function mget(self, keys)
 	if self.redis_cls ~= nil then
 		local ret = {}
@@ -62,11 +69,18 @@ function mget(self, keys)
 	 end
 end
 
+---set cache value by key
+--@param #string key cache key
+--@param #string val cache value string
+--@param #int expired expired time(second)
 function set(self, key, val, expired)
     expired = expired or 0
 	return self.redis_cls:setex(key, expired, val)
 end
 
+---set cache value from map table
+--@param #table tbl cache table(k/v map)
+--@param #int expired expired time(second)
 function mset(self, tbl, expired)
     expired = expired or 0
 	if self.redis_cls ~= nil then
@@ -79,6 +93,8 @@ function mset(self, tbl, expired)
 	end
 end
 
+---del the cache key
+--@param #string key cache key will be deleted
 function del(self, key)
 	if self.redis_cls ~= nil then
 		return self.redis_cls:del(key)
@@ -87,6 +103,8 @@ function del(self, key)
 	end
 end
 
+---del cache from table
+--@param #table tbl key list
 function mdel(self, keys)
 	if self.redis_cls ~= nil then
 		local nkeys = #keys
@@ -100,6 +118,9 @@ function mdel(self, keys)
 	end
 end
 
+---inc
+--@param #string key cache key
+--@param #int num incr number
 function incr(self, key, num)
 	num = num or 1
 	if self.redis_cls ~= nil then
@@ -109,6 +130,7 @@ function incr(self, key, num)
 	end
 end
 
+---close connection
 function close(self)
 	self.redis_cls:set_keepalive(self.keepalive,  self.pool)
 end

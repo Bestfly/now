@@ -3,7 +3,7 @@ local require = require
 local error = error
 local gsub = string.gsub
 
----一个简单的模板引擎。只支持lua语法和{{变量}}的替换
+---一个简单的模板引擎。只支持lua语法和{#变量#}的替换
 module(...)
 
 local _tplFun = {}
@@ -28,8 +28,8 @@ function tpl(tpl, key, data)
 		local str = "local args = {...}\nlocal data = args[1]\nstr=[[\n"
 		tstr = gsub(tstr, "<!%-%-{", "]]")
 		tstr = gsub(tstr, "}%-%->", "\nstr=str..[[")
-		tstr = gsub(tstr, "{{", "]]\nstr=str..")
-		tstr = gsub(tstr, "}}", "\nstr=str..[[")
+		tstr = gsub(tstr, "{#", "]]\nstr=str..")
+		tstr = gsub(tstr, "#}", "\nstr=str..[[")
 		str = str..tstr.."\n]]\nreturn str"
 		_tplFun[ck] = loadstring(str)
 	end

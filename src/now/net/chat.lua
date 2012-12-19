@@ -16,7 +16,7 @@ function new(self, o)
 	o['sock'] = tcp()
 	o['conn'] = false
 	o['rec'] = ''
-    return setmetatable(o, mt)
+    return setmetatable(o, _mt)
 end
 
 local function _do_send(self, cmd)

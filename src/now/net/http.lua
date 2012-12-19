@@ -3,7 +3,7 @@ local gsub = string.gsub
 local find = string.find
 local pairs = pairs
 
----简单的http客户端。支持get/post/head/delete/put这几种method。其他不支持
+---simple http client。get/post/head/delete/put support
 module(...)
 
 local _cfg = {
@@ -37,8 +37,8 @@ local _cfg = {
 local function _getUri(url)
     local parsed = {}
     -- empty url is parsed to nil
-    if not url or url == "" then 
-    	return nil, "invalid url" 
+    if not url or url == '' then 
+    	return nil, 'invalid url' 
     end
     
     -- remove whitespace
@@ -46,38 +46,38 @@ local function _getUri(url)
     -- get fragment
     url = gsub(url, "#(.*)$", function(f)
         parsed.fragment = f
-        return ""
+        return ''
     end)
     
     -- get scheme
     url = gsub(url, "^([%w][%w%+%-%.]*)%:", function(s) 
     	parsed.scheme = s
-    	return ""
+    	return ''
     end)
         
     -- get authority
     url = gsub(url, "^//([^/]*)", function(n)
         parsed.authority = n
-        return ""
+        return ''
     end)
     
     -- get query stringing
     url = gsub(url, "%?(.*)", function(q)
         parsed.query = q
-        return ""
+        return ''
     end)
     
     -- get params
     url = gsub(url, "%;(.*)", function(p)
         parsed.params = p
-        return ""
+        return ''
     end)
     
     -- path is whatever was left
-    if url ~= "" then 
+    if url ~= '' then 
     	parsed.path = url 
     else
-    	parsed.path = "/"
+    	parsed.path = '/'
     end
     
     local authority = parsed.authority
@@ -88,15 +88,15 @@ local function _getUri(url)
     
     authority = gsub(authority,"^([^@]*)@", function(u) 
 	    parsed.userinfo = u
-	    return "" 
+	    return '' 
     end)
     
     authority = gsub(authority, ":([^:]*)$", function(p) 
     	parsed.port = p
-		return ""
+		return ''
 	end)
 	
-    if authority ~= "" then 
+    if authority ~= '' then 
     	parsed.host = authority 
     end
     if parsed.port == nil then
@@ -110,7 +110,7 @@ local function _getUri(url)
     
     userinfo = gsub(userinfo, ":([^:]*)$", function(p) 
     	parsed.password = p
-    	return ""
+    	return ''
     end)
     
     parsed.user = userinfo
@@ -123,10 +123,10 @@ end
 --@return #table 经过处理的头信息
 local function _getHead(uri, head)
 	local ret = {
-	   ["user-agent"] = "resty.http/1.0",
-       ["connection"] = "close TE",
-       ["te"] = "trailers",
-       ["host"] = uri["host"]
+	   ['user-agent'] = 'resty.http/1.0',
+       ['connection'] = 'close TE',
+       ['te'] = 'trailers',
+       ['host'] = uri['host']
 	}
 	for k,v in pairs(head) do
 		ret[string.lower(k)] = v
@@ -140,13 +140,13 @@ end
 --@param #table head 头信息
 --@return #string 发送给服务器的字符串内容
 local function _buildStr(method, uri, head)
-	local ret = method.." "..uri["path"]
+	local ret = method..' '..uri['path']
 	if uri['query'] ~= nil then
-		ret = ret.."?"..uri['query']
+		ret = ret..'?'..uri['query']
 	end
-	ret = ret.." HTTP/1.1"
+	ret = ret..' HTTP/1.1'
 	for k,v in pairs(head) do
-		ret = ret .. "\r\n" .. k .. ": " .. v
+		ret = ret .. "\r\n" .. k .. ': ' .. v
 	end
 	return ret
 end
@@ -156,8 +156,8 @@ end
 --@param #int size 需要读取的数据大小
 --@return #string 返回的body内容
 local function _fetchBodyData(sock, size)
-	local body = ""
-	local pSize = _cfg["bodyFetchSize"]	--每次接收多大的数据量
+	local body = ''
+	local pSize = _cfg['bodyFetchSize']	--每次接收多大的数据量
 	while size and size > 0 do
 		if size < pSize then
 			pSize = size
@@ -167,7 +167,7 @@ local function _fetchBodyData(sock, size)
 			if data then
 				body = body .. data
 			end
-		elseif err == "closed" then
+		elseif err == 'closed' then
 			if partial then
 				body = body .. partial
 			end
@@ -192,10 +192,10 @@ local function _readHttpHead(sock)
 		return nil,err
 	end
 	
-    while line ~= "" do
+    while line ~= '' do
     	_, _, name, value = find(line, "^(.-):%s*(.*)")
     	if not (name and value) then
-			return nil, "unknown response header name and value"
+			return nil, 'unknown response header name and value'
     	end
     	name = string.lower(name)
     	
@@ -211,7 +211,7 @@ local function _readHttpHead(sock)
 			end
     	end
     	if ret[name] then
-    		ret[name] = ret[name] .. "," .. value
+    		ret[name] = ret[name] .. ',' .. value
     	else
     		ret[name] = value
     	end
@@ -230,21 +230,21 @@ local function _fetchResult(method, host, port, str)
 	
 	local sock = tcp()
 	if not sock then
-		return nil,nil,nil, "error to init tcp"
+		return nil,nil,nil, 'error to init tcp'
 	end
 	
 	--连接到服务器
-	sock:settimeout(_cfg["timeout"])
+	sock:settimeout(_cfg['timeout'])
 	local ok, err = sock:connect(host, port)
 	if err then
-		return nil,nil,nil, "error to connect to host "..host.." in port="..port..' err='..err
+		return nil,nil,nil, 'error to connect to host '..host..' in port='..port..' err='..err
 	end
 	
 	--发送请求
 	local bytes, err = sock:send(str)
 	if err then
 		sock:close()
-		return nil,nil,nil,"error while send data to "..host.." in port="..port..' err='..err
+		return nil,nil,nil,'error while send data to '..host..' in port='..port..' err='..err
 	end
 	
 	--读取返回的状态信息
@@ -252,7 +252,7 @@ local function _fetchResult(method, host, port, str)
 	local data, err, partial = status_reader()
     if not data then
     	sock:close()
-		return nil,nil,nil, "failed to read the data stream: "..err
+		return nil,nil,nil, 'failed to read the data stream: '..err
     end
     local _, _, code = find(data, "HTTP/%d*%.%d* (%d%d%d)")
     
@@ -260,62 +260,62 @@ local function _fetchResult(method, host, port, str)
     code = tonumber(code)
     if not code then
     	sock:close()
-		return nil, nil, nil, "read status error"
+		return nil, nil, nil, 'read status error'
     end
-    ret["code"] = code
+    ret['code'] = code
     
     --读取所有的头信息
     local header, err = _readHttpHead(sock)
     if err then
     	sock:close()
-		return nil, nil, nil, "error in read header:"..err
+		return nil, nil, nil, 'error in read header:'..err
     end
-    ret["header"] = header
+    ret['header'] = header
     
     --根据需要读取body信息  302未处理。
-	if ret["code"] == 204 or ret["code"] == 304 then
-    	ret["body"] = nil
-	elseif ret["code"] >=100 and ret["code"] < 200 then
-    	ret["body"] = nil
+	if ret['code'] == 204 or ret['code'] == 304 then
+    	ret['body'] = nil
+	elseif ret['code'] >=100 and ret['code'] < 200 then
+    	ret['body'] = nil
 	else
-    	local t = header["transfer-encoding"]
+    	local t = header['transfer-encoding']
     	local body, err
-    	if t and t ~= "identity" then
+    	if t and t ~= 'identity' then
 	    	while true do
 	            local chunk_header = sock:receiveuntil("\r\n")
 	            local data, err, partial = chunk_header()
 	            if not err then
-	                if data == "0" then
+	                if data == '0' then
 	                    break
 	                else
 	                    local size = tonumber(data, 16)
-						if size > _cfg["bodyMaxSize"] then
-							return nil, nil, nil, "chunk size > bodyMaxSize"
+						if size > _cfg['bodyMaxSize'] then
+							return nil, nil, nil, 'chunk size > bodyMaxSize'
 						end
 	                    local tmp, err = _fetchBodyData(sock, size)
 	                    if err then
 					    	sock:close()
-							return nil,nil,nil, "error in get chunk data"..err
+							return nil,nil,nil, 'error in get chunk data'..err
 	                    end
 	                    body = body .. tmp
 	                end
 	            end
 	        end
-		elseif header["content-length"] ~= nil and header["content-length"] ~= "0" then
-			local size = tonumber(header["content-length"])
-			if size > _cfg["bodyMaxSize"] then
-				return nil, nil, nil, "content-length > bodyMaxSize"
+		elseif header['content-length'] ~= nil and header['content-length'] ~= '0' then
+			local size = tonumber(header['content-length'])
+			if size > _cfg['bodyMaxSize'] then
+				return nil, nil, nil, 'content-length > bodyMaxSize'
 			end
 			body, err = _fetchBodyData(sock, size)
 		else
-			body, err = _fetchBodyData(sock, _cfg["bodyMaxSize"])
+			body, err = _fetchBodyData(sock, _cfg['bodyMaxSize'])
 		end
 		
 	    if err then
 	    	sock:close()
-			return nil, nil, nil, "error in read header:"..err
+			return nil, nil, nil, 'error in read header:'..err
 	    end
-	    ret["body"] = body
+	    ret['body'] = body
     end
 	sock:close()
     
@@ -323,14 +323,16 @@ local function _fetchResult(method, host, port, str)
 end
 
 ---发送请求
-function _request(method, url, header, body)
+function request(method, url, header, body)
 	header = header or {}
 	local uri = _getUri(url)
 	local header = _getHead(uri, header)
 	local str
-	if method == "POST" or method == "PUT" then
-		header["Content-Length"] = #body
-		header["Content-Type"] = "application/x-www-form-urlencoded"
+	if method == 'POST' or method == 'PUT' then
+		header['content-length'] = #body
+		if header['content-type'] == nil then
+			header['content-type'] = 'application/x-www-form-urlencoded'
+		end
 	    str = _buildStr(method, uri, header)
 	    str = str.."\r\n\r\n"..body
 	else
@@ -342,25 +344,25 @@ end
 
 ---发送GET请求
 function get(url, header)
-	return _request('GET', url, header)
+	return request('GET', url, header)
 end
 
 ---发送head请求
 function head(url, header)
-	return _request('HEAD', url, header)
+	return request('HEAD', url, header)
 end
 
 ---发送post请求
 function post(url, body, header)
-	return _request('POST', url, header, body)
+	return request('POST', url, header, body)
 end
 
 ---发送delete请求
 function delete(url, header)
-	return _request('DELETE', url, header)
+	return request('DELETE', url, header)
 end
 
 ---发送put请求
 function put(url, body, header)
-	return _request('PUT', url, header, body)
+	return request('PUT', url, header, body)
 end
