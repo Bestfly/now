@@ -1,5 +1,6 @@
 local base = require 'now.base'
 local tbl = require 'now.util.tbl'
+local setmetatable = setmetatable
 
 module(...)
 

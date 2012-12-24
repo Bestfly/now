@@ -10,7 +10,7 @@ local _mt = { __index = _M }
 ---传递参数 {host, port, keepalive,  timeout
 function new(self, o)
 	o = o or {}
-	tbl.add_to_tbl(o, {
+	tbl.addToTbl(o, {
 		keepalive=200,
 		timeout=1000
 	})

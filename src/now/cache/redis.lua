@@ -11,7 +11,7 @@ local _mt = { __index = _M }
 --- host port
 function new(self, o)
 	o = o or {}
-	tbl.add_to_tbl(o, {
+	tbl.addToTbl(o, {
 		keepalive=200,
 		timeout=1000,
 		pool = 100
