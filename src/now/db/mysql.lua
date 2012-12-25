@@ -7,22 +7,17 @@ local base = require 'gnow.base'
 local mysql = require 'resty.mysql'
 local tbl = require 'now.util.tbl'
 
----mysql数据库连接及请求的封装
---@author 		欧远宁
---@copyright 	欧远宁
---@version 		1.0
 module(...)
 
 local _mt = { __index = _M }
 
----根据SQL和对应参数，重新生成SQL。避免SQL注入
---@function [parent=#gnow.mysql] _buildSql
---@param #string sql SQL语句
---@param #table para SQL语句中部分变量的值
+---build sql string with para
+--@param #string sql sql string
+--@param #table para 
 local function _buildSql(sql, para)
 	if para then
-		for k,v in pairs(para) do
-			if type(v) == "string" then
+		for k, v in pairs(para) do
+			if type(v) == 'string' then
 				para[k] = "'"..v.."'"
 			end
 		end
@@ -31,7 +26,7 @@ local function _buildSql(sql, para)
 	return sql
 end
 
----打开SQL连接
+---open mysql connection
 --@function [parent=#gnow.mysql] _open
 local function _open(self)
 	if self._open == false then

@@ -6,7 +6,7 @@ module(...)
 
 local _mt = { __index = _M }
 
----初始化，需包含的参数为 {host='',port=''}
+---new instance {host='127.0.0.1', port=1978}
 function new(self, o)
 	o = o or {
 		host = '127.0.0.1',
@@ -21,12 +21,15 @@ end
 
 
 function rollback(self)
+	--donothing
 end
 
 function commit(self)
+	--
 end
 
 function get(self, key)
+	
 end
 
 function mdf(self, key, val)

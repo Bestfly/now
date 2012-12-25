@@ -4,8 +4,10 @@ local setmetatable = setmetatable
 
 ---data access object
 module(...)
+
 local _mt = { __index = _M }
 
+--- new instance {cfg=}
 function new(self, o)
 	
 end

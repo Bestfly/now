@@ -2,7 +2,7 @@ local http = require 'now.net.http'
 local decode_args = ngx.decode_args
 local setmetatable = setmetatable
 
----Kyoto Tycoon http client。  only rpc protocal support
+---Kyoto Tycoon http client。  only rpc protocol support
 module(...)
 
 local _mt = { __index = _M }
@@ -25,7 +25,6 @@ function new(self, o)
 		host = '127.0.0.1',
 		port = 1978
 	}
-	o['http'] = http:new()
     return setmetatable(o, _mt)
 end
 
@@ -40,16 +39,16 @@ function _do_cmd(self)
 	local args = {...}
 	local ret
 	if #args == 1 then  --get
-		ret = self::get(url, {})
+		ret = http.get(url, {})
 	else --post
-		ret = self::post(url, {}, args[2])
+		ret = http.post(url, {}, args[2])
 	end
 	return _read_reply(ret)
 end
 
 for i = 1, #_commands do
 	local cmd = _commands[i]
-	_cls[cmd] = function(self, ...)
+	_M[cmd] = function(self, ...)
 					return _do_cmd(self, cmd, ...)
 				end
 end

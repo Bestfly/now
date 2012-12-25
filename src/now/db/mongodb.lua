@@ -4,6 +4,8 @@ local setmetatable = setmetatable
 
 module(...)
 
+local _mt = { __index = _M }
+
 ---
 function _open(self)
 end

@@ -8,12 +8,14 @@ module(...)
 
 local _mt = { __index = _M }
 
---- host port
+--- new instance {host='', port='', keepalive=200, timeout=1000, pool=100}
 function new(self, o)
 	o = o or {}
 	tbl.addToTbl(o, {
-		keepalive=200,
-		timeout=1000,
+		host = '127.0.0.1',
+		port = 6379,
+		keepalive = 200,
+		timeout = 1000,
 		pool = 100
 	})
     return setmetatable(o, _mt)
@@ -21,9 +23,9 @@ end
 
 ---open socket
 function open(self)
-	self.redis_cls = redis:new()
-	self.redis_cls:set_timeout(self.timeout)
-    local ok, err = self.redis_cls:connect(self.host,  self.port)
+	self.redisCls = redis:new()
+	self.redisCls:set_timeout(self.timeout)
+    local ok, err = self.redisCls:connect(self.host,  self.port)
     if err then
     	return false , 'error to connet redis err='..err
     else
@@ -34,8 +36,8 @@ end
 ---get cache value by key
 --@param #string key cache key
 function get(self, key)
-	if self.redis_cls ~= nil then
-		local res, err = self.redis_cls:get(key)
+	if self.redisCls ~= nil then
+		local res, err = self.redisCls:get(key)
 	    if err then
 	    	return nil, 'error to get data. err='..err
 	    end
@@ -52,7 +54,7 @@ end
 ---get values by keys
 --@param #table keys cache keys
 function mget(self, keys)
-	if self.redis_cls ~= nil then
+	if self.redisCls ~= nil then
 		local ret = {}
 		local nkeys = #keys
 		
@@ -61,7 +63,7 @@ function mget(self, keys)
 		end
 		
 		for i=1, nkeys do
-			ret[k] = self.redis_cls:get(keys[i])
+			ret[k] = self.redisCls:get(keys[i])
 		end
 		return ret
 	else
@@ -75,7 +77,7 @@ end
 --@param #int expired expired time(second)
 function set(self, key, val, expired)
     expired = expired or 0
-	return self.redis_cls:setex(key, expired, val)
+	return self.redisCls:setex(key, expired, val)
 end
 
 ---set cache value from map table
@@ -83,9 +85,9 @@ end
 --@param #int expired expired time(second)
 function mset(self, tbl, expired)
     expired = expired or 0
-	if self.redis_cls ~= nil then
+	if self.redisCls ~= nil then
 		for k, v in pairs(tbl) do
-			self.redis_cls:setex(k, expired, v)
+			self.redisCls:setex(k, expired, v)
 		end
 		return true
 	else
@@ -96,8 +98,8 @@ end
 ---del the cache key
 --@param #string key cache key will be deleted
 function del(self, key)
-	if self.redis_cls ~= nil then
-		return self.redis_cls:del(key)
+	if self.redisCls ~= nil then
+		return self.redisCls:del(key)
 	else
 		return false, 'conn is not exist'
 	end
@@ -106,11 +108,11 @@ end
 ---del cache from table
 --@param #table tbl key list
 function mdel(self, keys)
-	if self.redis_cls ~= nil then
+	if self.redisCls ~= nil then
 		local nkeys = #keys
 		
 		for i=1, nkeys do
-			self.redis_cls:del(keys[i])
+			self.redisCls:del(keys[i])
 		end
 		return true
 	else
@@ -123,8 +125,8 @@ end
 --@param #int num incr number
 function incr(self, key, num)
 	num = num or 1
-	if self.redis_cls ~= nil then
-		return self.redis_cls:incrby(key, num)
+	if self.redisCls ~= nil then
+		return self.redisCls:incrby(key, num)
 	else
 		return false, 'conn is not exist'
 	end
@@ -132,7 +134,7 @@ end
 
 ---close connection
 function close(self)
-	self.redis_cls:set_keepalive(self.keepalive,  self.pool)
+	self.redisCls:set_keepalive(self.keepalive,  self.pool)
 end
 
 local class_mt = {

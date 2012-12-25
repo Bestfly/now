@@ -7,35 +7,42 @@ module(...)
 
 local _mt = { __index = _M }
 
----传递参数 {host, port, keepalive,  timeout
+--- {host, port, keepalive,  timeout, pool}
 function new(self, o)
 	o = o or {}
 	tbl.addToTbl(o, {
-		keepalive=200,
-		timeout=1000
+		host = '127.0.0.1',
+		port = 11211,
+		keepalive = 200,
+		timeout = 1000,
+		pool = 100
 	})
-	o["update_list"] = {}
-	o["delete_list"] = {}
-	o["isclose"] = true
+	o['getList'] = {}
+	o['updateList'] = {}
+	o['deleteList'] = {}
+	o['isclose'] = true
     return setmetatable(o, _mt)
 end
 
+---rollback
 function rollback(self)
-
+	-- do nothing
 end
 
+---commit
 function commit(self)
 
 end
 
+---connect memcached server
 local function _open(self)
 	if self.isclose then
-		self.mem_cls = memcached:new()
-		self.mem_cls:set_timeout(self.timeout)
-        local ok, err = self.mem_cls:connect(self.host,  self.port)
+		self.memCls = memcached:new()
+		self.memCls:set_timeout(self.timeout)
+        local ok, err = self.memCls:connect(self.host,  self.port)
         if not ok then
-            ngx.log(ngx.ERR,"failed to connect memcached at host="..self.host.." port="..self.port)
-            self.mem_cls = nil
+            self.memCls = nil
+            base.error('error to connect memcached server host='..self.host..' port='..self.port)
         else
 			self.isclose = false
         end
@@ -43,21 +50,17 @@ local function _open(self)
 end
 
 local function _get(self, key)
-	local res, flags, err = self.mem_cls:get(key)
+	local res, flags, err = self.memCls:get(key)
     if err then
-		ngx.log(ngx.ERR,"error to get memcache key="..key.." err="..err)
-		self.mem_cls  = nil
+		self.memCls  = nil
 		self.isopen = false
-        return nil
+        base.error('error to connect memcached server host='..self.host..' port='..self.port)
     end
-    if not res then
-        return nil
-    end
-    return res
+    return base.jsonDecode(res)
 end
 
 function get(self, key)
-	if type(key) == "string" then
+	if type(key) == 'string' then
 		return self::_get(key)
 	else
 		return self::_get(key)
@@ -77,7 +80,7 @@ function del(self, key)
 end
 
 function close(self)
-	self.mem_cls:set_keepalive(0, self.keepalive)
+	self.memCls:set_keepalive(0, self.keepalive)
 end
 
 local class_mt = {

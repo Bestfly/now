@@ -10,33 +10,25 @@ module(...)
 local json = nil
 
 ---get json module
-local function _get_json()
-	local _cjson = function()
-		json = require 'cjson'
-	end
+local _cjson = function()
+	json = require 'cjson'
+end
+if not json then
+	pcall(_cjson)
 	if not json then
-		pcall(_cjson)
-		if not json then
-			json = require 'util.dkjson'
-		end
+		json = require 'util.dkjson'
 	end
 end
 
 ---encode table to json string
 --@param #table tbl table will be encode
-function json_encode(tbl)
-	if not json then
-		_get_json()
-	end
+function jsonEncode(tbl)
 	return json.encode(tbl)
 end
 
 ---get table from json string
 --@param #string str json string
-function json_decode(str)
-	if not json then
-		_get_json()
-	end
+function jsonDecode(str)
 	return json.decode(str)
 end
 
@@ -68,7 +60,7 @@ end
 --@param #string  msg error msg
 --@param #int code error code
 --@return   void
-function err(msg, code)
+function error(msg, code)
     if code == nil then code = 1 end
 	if msg == nil then msg = 'err' end
     ngx.print(json_encode({_m=msg, _c=code, _time=ngx.time()}))

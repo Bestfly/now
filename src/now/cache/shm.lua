@@ -2,6 +2,7 @@ local tbl = require 'now.util.tbl'
 local ngx = ngx
 local pairs = pairs
 local abs = abs
+local base = require 'now.base'
 
 ---use ngx.shared for cache
 module(...)
@@ -15,7 +16,7 @@ function new(self, o)
 		dict = 'dao'
 	})
 	if ngx.shared[o.dict] == nil then
-		error('ngx.shared.'..o['dict']..' is not exist')
+		base.error('ngx.shared.'..o['dict']..' is not exist')
 	end
 	o.bufList = {}
 	o.delList = {}

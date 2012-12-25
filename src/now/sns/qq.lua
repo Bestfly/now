@@ -1,8 +1,21 @@
----facebook api for sns application
+local http = require 'now.net.http'
+local setmetatable = setmetatable
+
+---qq api for sns application
 module(...)
 
 local _mt = { __index = _M }
 
+---new instance {url='', port=80, appId'='', appKey=''}
+function new(self, o)
+	o = o or {
+		port = 80
+	}
+    return setmetatable(o, _mt)
+end
+
+function api()
+end
 
 local class_mt = {
     -- to prevent use of casual module global variables

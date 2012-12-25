@@ -13,7 +13,7 @@ local _mt = { __index = _M }
 ---传入'_key' 作为密钥
 function new(self, o)
 	if not o or o['_key'] == nil then
-		base.err('can not new session instance without _key')
+		base.error('can not new session instance without _key')
 	end
 	o._data = {}
 	o.change = false
@@ -25,11 +25,11 @@ end
 function init(self, str)
 	local arr = base.split('|', str)
 	if #arr ~= 3 then
-		base.err('init session error')
+		base.error('init session error')
 	end
 	local key = md5(arr[1]..self_key..arr[3])
 	if key ~= arr[2] then
-		base.err('session key error')
+		base.error('session key error')
 	end
 	self._data = decodebase64(base.json_decode(arr[3]))
 end

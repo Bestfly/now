@@ -13,7 +13,7 @@ function json(data)
 	ngx.header['Content-Type'] = 'text/html;charset=utf-8'
 	ngx.header['Expires'] = '0'
 	ngx.header['Cache-Control'] = 'public,must-revalidate,max-age=0,post-check=0,pre-check=0'
-	ngx.print(base.json_encode(data))
+	ngx.print(base.jsonEncode(data))
 end
 
 ---return jsonp string to browser
@@ -23,7 +23,7 @@ function jsonp(data, callback)
 	ngx.header['Content-Type'] = 'text/html;charset=utf-8'
 	ngx.header['Expires'] = '0'
 	ngx.header['Cache-Control'] = 'public,must-revalidate,max-age=0,post-check=0,pre-check=0'
-	ngx.print(callback..'('..base.json_encode(data)..')')
+	ngx.print(callback..'('..base.jsonEncode(data)..')')
 end
 
 ---return html string to browser
