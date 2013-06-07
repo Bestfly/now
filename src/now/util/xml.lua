@@ -12,7 +12,7 @@ module(...)
 local function _parseargs (s)
   local arg = {}
   gsub(s, "(%w+)=([\"'])(.-)%2", function (w, _, a)
-    %arg[w] = a
+    arg[w] = a
   end)
   return arg
 end

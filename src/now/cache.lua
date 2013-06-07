@@ -40,7 +40,7 @@ function commit(self)
 		local ins = self:_getIns(mdl)
 		for k,v in pairs(val) do
 			if v[2] > 0 then
-				ins::set(key, v[1], v[2])
+				ins:set(key, v[1], v[2])
 			end
 		end
 	end
@@ -48,7 +48,7 @@ function commit(self)
 	for mdl, val in pairs(self.delList) do
 		local ins = self:_getIns(mdl)
 		for k,v in pairs(val) do
-			ins::del(key)
+			ins:del(key)
 		end
 	end
 	
@@ -97,7 +97,7 @@ function mget(self, mdl, keys)
 	end
 	
 	for i=1, len do
-		ret[keys[i]] = self::get(mdl, keys[i])
+		ret[keys[i]] = self:get(mdl, keys[i])
 	end
 	
 	return ret

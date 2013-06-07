@@ -15,7 +15,7 @@ local _commands = {
 'check', 	'seize', 	'set_bulk', 'remove_bulk',
 'get_bulk', 'vacuum', 	'match_prefix', 		'match_similar', 'cur_jump',
 'cur_jump_back', 'cur_step', 'cur_step_back', 'cur_set_value',
-'cur_remove', 'cur_get_key', 'cur_get_value', 'cur_get', 'cur_seize'
+'cur_remove', 'cur_get_key', 'cur_get_value', 'cur_get', 'cur_seize',
 'cur_delete'
 }
 
@@ -35,7 +35,7 @@ local function _read_reply(data)
 	return ret
 end
 
-function _do_cmd(self)
+function _do_cmd(self, ...)
 	local args = {...}
 	local ret
 	if #args == 1 then  --get

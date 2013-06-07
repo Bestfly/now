@@ -10,7 +10,7 @@ local _mt = { __index = _M }
 
 ---para : {host='',port=''}
 function new(self, o)
-	o = o || {
+	o = o or {
 		host = "127.0.0.1",
 		port = 1978
 	}

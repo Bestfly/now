@@ -61,9 +61,9 @@ end
 
 function get(self, key)
 	if type(key) == 'string' then
-		return self::_get(key)
+		return self:_get(key)
 	else
-		return self::_get(key)
+		return self:_get(key)
 	end
 end
 

@@ -13,27 +13,18 @@ function new(self, o)
 	o = o or {
 		host = '127.0.0.1',
 		port = 1978
-	}
-	o['kt'] = kt:new({
-		host = o.host,
-		port = o.port
-	})
+    }
+    o.kt_cls = kt:new({
+        host = o.host,
+        port = o.port
+    })
     return setmetatable(o, _mt)
-end
-
----open socket
-function open(self)
-	self.kt_cls = redis:new({
-		host = self.host,
-		port = self.port
-	})
-	return true
 end
 
 ---get cache value by key
 --@param #string key cache key
 function get(self, key)
-	return self.kt_cls::get({
+	return self.kt_cls:get({
 		db = self.db,
 		key = key
 	})
@@ -48,7 +39,7 @@ function mget(self, keys)
 		return ret
 	else
 		for i=1, len do
-			local v = self.kt_cls::get({
+			local v = self.kt_cls:get({
 							db = self.db,
 							key = keys[i]
 						})
@@ -63,7 +54,7 @@ end
 --@param #string val cache value string
 --@param #int expired expired time(second)
 function set(self, key, val, expired)
-	expired = expired || 0
+	expired = expired or 0
 	self.kt_cls:set({
 		db = self.db,
 		key = key,
@@ -76,7 +67,7 @@ end
 --@param #table tbl cache table(k/v map)
 --@param #int expired expired time(second)
 function mset(self, tbl, expired)
-	expired = expired || 0
+	expired = expired or 0
 	for k,v in pairs(tbl) do
 		self.kt_cls:set({
 			db = self.db,
@@ -90,7 +81,7 @@ end
 ---del the cache key
 --@param #string key cache key will be deleted
 function del(self, key)
-	self.kt_cls::remove({
+	self.kt_cls:remove({
 			db = self.db,
 			key = key
 			})
@@ -105,7 +96,7 @@ function mdel(self, keys)
 		return ret
 	else
 		for i=1, len do
-			local v = self.kt_cls::remove({
+			local v = self.kt_cls:remove({
 							db = self.db,
 							key = keys[i]
 						})
@@ -119,7 +110,7 @@ end
 --@param #string key cache key
 --@param #int num incr number
 function incr(self, key, num)
-	return self.kt_cls::increment({
+	return self.kt_cls:increment({
 			db = self.db,
 			key = key,
 			num = num

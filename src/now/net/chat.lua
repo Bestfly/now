@@ -60,7 +60,7 @@ function send(self, to, msg)
         local rand_str = ngx.time()..tostring(random(100, 999))
         local crypt_code = md5(rand_str..self.code)
         local cmd = {cmd='login', uid='', app=self.app, code=rand_str..'|'..crypt_code}
-    	local ret = self::do_send(cmd)
+    	local ret = self:do_send(cmd)
     end
     
     local cmd = {cmd='chat', from='', to=to, msg=msg}

@@ -59,7 +59,7 @@ end
 --@param #table keys cache keys
 function mget(self, keys)
 	if self.memCls ~= nil then
-		return self::get(keys)
+		return self:get(keys)
 	else
 		return false, 'conn is not exist'
 	end

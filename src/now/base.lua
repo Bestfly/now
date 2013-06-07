@@ -7,7 +7,7 @@ local ngx = ngx
 ---now frmamework base module
 module(...)
 --cjson.encode_sparse_array(true)
-local json = nil
+local json
 
 ---get json module
 local _cjson = function()
