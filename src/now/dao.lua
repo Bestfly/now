@@ -9,7 +9,7 @@ local _mt = { __index = _M }
 
 --- new instance {cfg=}
 function new(self, o)
-	
+
 end
 
 function begin(self)
@@ -31,6 +31,10 @@ function del(self, mdl, filter)
 end
 
 function find(self, mdl)
+end
+
+function sql(self, sql)
+
 end
 
 function random(self, mdl, tbl)

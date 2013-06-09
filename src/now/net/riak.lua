@@ -56,7 +56,7 @@ end
 
 function set_bucket(self, bucket, props)
 	local url = '/buckets/'..bucket..'/props'
-	local ret = self.http:put(url, {["Content-Length"] = "application/json"}, base.json_encode(props))
+	local ret = self.http:put(url, {["Content-Length"] = "application/json"}, base.jsonEncode(props))
 	return ret
 end
 
@@ -72,7 +72,7 @@ function store_object(self, bucket, key, val, para)
 		url = url .. '?' .. encode_args(para)
 	end
 	if type(val) == 'table' then
-		return self.http:put(url, {["Content-Length"] = "application/json"}, base.json_encode(val))
+		return self.http:put(url, {["Content-Length"] = "application/json"}, base.jsonEncode(val))
 	else
 		return self.http:put(url, {["Content-Length"] = "text/plain"}, val)
 	end

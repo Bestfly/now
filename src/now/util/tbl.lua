@@ -104,9 +104,9 @@ end
 --@param    fields  table   需要移除的字段
 --@usage	local mdl = require("nao.util.tbl") <br/>
 --			local tbl = {k1="v1",k2="v2",k3="v3"}<br/>
---			mdl.mv_tbl_field(tbl,{"k1","k2"})<br/>
+--			mdl.mvFields(tbl,{"k1","k2"})<br/>
 --			local tbl2 = {{k1="v1",k2="v2"},{k1="vv1",k2="vv2"}}<br/>
---			mdl.mv_tbl_field(tbl2,{"k1"})
+--			mdl.mvFields(tbl2,{"k1"})
 --@return   void
 function mvFields(tbl, fields)
     if #tbl == 0 then --一般空的table和hash的table都会返回0

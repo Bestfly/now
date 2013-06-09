@@ -1,6 +1,7 @@
 local ngx = ngx
 
 ---log api
+--暂时先直接使用ngx的log
 module(...)
 
 DEBUG = ngx.DEBUG

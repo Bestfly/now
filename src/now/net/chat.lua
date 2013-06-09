@@ -21,7 +21,7 @@ end
 
 local function _do_send(self, cmd)
 	local sock = self.sock
-    local cmd_str = base.json_encode(cmd)
+    local cmd_str = base.jsonEncode(cmd)
     local len = 100000 + #cmd_str;
     local send_msg = tostring(len)..cmd_str
     local bytes, err = sock:send(send_msg)

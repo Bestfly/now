@@ -37,7 +37,7 @@ end
 ---得到新的session字符串
 function save(self)
 	local rand = tostring(ngx.now * 1000)
-	local data = encodebase64(base.json_encode(self._data))
+	local data = encodebase64(base.jsonEncode(self._data))
 	local key = md5(rand..'|'..self_key..'|'..data)
 	local str = rand..'|'..key..'|'..data
 end

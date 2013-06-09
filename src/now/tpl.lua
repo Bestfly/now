@@ -2,6 +2,7 @@ local ngx = ngx
 local require = require
 local error = error
 local gsub = string.gsub
+local loadstring = loadstring
 
 ---一个简单的模板引擎。只支持lua语法和{#变量#}的替换
 module(...)
@@ -18,7 +19,7 @@ function tpl(tpl, key, data)
 	local ck = tpl..'_'..key
 	
 	if _tplFun[ck] == nil then
-	    local mdl = _require(tpl)
+	    local mdl = require(tpl)
 	    if mdl == nil or mdl[key] == nil then
 	    	error('tpl not exist tpl='..tpl..' key='..key)
 	    end
