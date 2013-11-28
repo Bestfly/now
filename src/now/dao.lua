@@ -1,4 +1,5 @@
 local base = require 'now.base'
+local tbl = require 'now.util.tbl'
 local error = error
 local setmetatable = setmetatable
 
@@ -9,7 +10,10 @@ local _mt = { __index = _M }
 
 --- new instance {cfg=}
 function new(self, o)
-
+    o = o or {}
+    tbl.addToTbl(o, {
+    })
+    return setmetatable(o, _mt)
 end
 
 function begin(self)

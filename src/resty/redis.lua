@@ -1,11 +1,9 @@
--- Copyright (C) 2012 Yichun Zhang (agentzh)
+-- Copyright (C) 2012-2013 Yichun Zhang (agentzh), CloudFlare Inc.
 
 
 local sub = string.sub
 local tcp = ngx.socket.tcp
-local insert = table.insert
 local concat = table.concat
-local len = string.len
 local null = ngx.null
 local pairs = pairs
 local unpack = unpack
@@ -14,34 +12,50 @@ local tonumber = tonumber
 local error = error
 
 
-module(...)
+local ok, new_tab = pcall(require, "table.new")
+if not ok then
+    new_tab = function (narr, nrec) return {} end
+end
 
-_VERSION = '0.15'
+
+local _M = new_tab(0, 151)
+_M._VERSION = '0.16'
+
 
 local commands = {
     "append",            "auth",              "bgrewriteaof",
-    "bgsave",            "blpop",             "brpop",
-    "brpoplpush",        "config",            "dbsize",
+    "bgsave",            "bitcount",          "bitop",
+    "blpop",             "brpop",
+    "brpoplpush",        "client",            "config",
+    "dbsize",
     "debug",             "decr",              "decrby",
-    "del",               "discard",           "echo",
+    "del",               "discard",           "dump",
+    "echo",
     "eval",              "exec",              "exists",
     "expire",            "expireat",          "flushall",
     "flushdb",           "get",               "getbit",
     "getrange",          "getset",            "hdel",
     "hexists",           "hget",              "hgetall",
-    "hincrby",           "hkeys",             "hlen",
+    "hincrby",           "hincrbyfloat",      "hkeys",
+    "hlen",
     "hmget",             --[[ "hmset", ]]     "hset",
     "hsetnx",            "hvals",             "incr",
-    "incrby",            "info",              "keys",
+    "incrby",            "incrbyfloat",       "info",
+    "keys",
     "lastsave",          "lindex",            "linsert",
     "llen",              "lpop",              "lpush",
     "lpushx",            "lrange",            "lrem",
     "lset",              "ltrim",             "mget",
+    "migrate",
     "monitor",           "move",              "mset",
     "msetnx",            "multi",             "object",
-    "persist",           "ping",              "psubscribe",
-    "publish",           "punsubscribe",      "quit",
+    "persist",           "pexpire",           "pexpireat",
+    "ping",              "psetex",            "psubscribe",
+    "pttl",
+    "publish",           "punsubscribe",      "pubsub",
+    "quit",
     "randomkey",         "rename",            "renamenx",
+    "restore",
     "rpop",              "rpoplpush",         "rpush",
     "rpushx",            "sadd",              "save",
     "scard",             "script",
@@ -53,7 +67,8 @@ local commands = {
     "smembers",          "smove",             "sort",
     "spop",              "srandmember",       "srem",
     "strlen",            "subscribe",         "sunion",
-    "sunionstore",       "sync",              "ttl",
+    "sunionstore",       "sync",              "time",
+    "ttl",
     "type",              "unsubscribe",       "unwatch",
     "watch",             "zadd",              "zcard",
     "zcount",            "zincrby",           "zinterstore",
@@ -67,7 +82,7 @@ local commands = {
 local mt = { __index = _M }
 
 
-function new(self)
+function _M.new(self)
     local sock, err = tcp()
     if not sock then
         return nil, err
@@ -76,7 +91,7 @@ function new(self)
 end
 
 
-function set_timeout(self, timeout)
+function _M.set_timeout(self, timeout)
     local sock = self.sock
     if not sock then
         return nil, "not initialized"
@@ -86,7 +101,7 @@ function set_timeout(self, timeout)
 end
 
 
-function connect(self, ...)
+function _M.connect(self, ...)
     local sock = self.sock
     if not sock then
         return nil, "not initialized"
@@ -96,7 +111,7 @@ function connect(self, ...)
 end
 
 
-function set_keepalive(self, ...)
+function _M.set_keepalive(self, ...)
     local sock = self.sock
     if not sock then
         return nil, "not initialized"
@@ -106,7 +121,7 @@ function set_keepalive(self, ...)
 end
 
 
-function get_reused_times(self)
+function _M.get_reused_times(self)
     local sock = self.sock
     if not sock then
         return nil, "not initialized"
@@ -116,7 +131,7 @@ function get_reused_times(self)
 end
 
 
-function close(self)
+function _M.close(self)
     local sock = self.sock
     if not sock then
         return nil, "not initialized"
@@ -167,18 +182,21 @@ local function _read_reply(sock)
             return null
         end
 
-        local vals = {};
+        local vals = new_tab(n, 0);
+        local nvals = 0
         for i = 1, n do
             local res, err = _read_reply(sock)
             if res then
-                insert(vals, res)
+                nvals = nvals + 1
+                vals[nvals] = res
 
             elseif res == nil then
                 return nil, err
 
             else
                 -- be a valid redis error value
-                insert(vals, {false, err})
+                nvals = nvals + 1
+                vals[nvals] = {false, err}
             end
         end
         return vals
@@ -199,25 +217,29 @@ end
 
 
 local function _gen_req(args)
-    local req = {"*", #args, "\r\n"}
+    local nargs = #args
 
-    for i = 1, #args do
+    local req = new_tab(nargs + 1, 0)
+    req[1] = "*" .. nargs .. "\r\n"
+    local nbits = 1
+
+    for i = 1, nargs do
         local arg = args[i]
+        nbits = nbits + 1
 
         if not arg then
-            insert(req, "$-1\r\n")
+            req[nbits] = "$-1\r\n"
 
         else
-            insert(req, "$")
-            insert(req, len(arg))
-            insert(req, "\r\n")
-            insert(req, arg)
-            insert(req, "\r\n")
+            if type(arg) ~= "string" then
+                arg = tostring(arg)
+            end
+            req[nbits] = "$" .. #arg .. "\r\n" .. arg .. "\r\n"
         end
     end
 
     -- it is faster to do string concatenation on the Lua land
-    return concat(req, "")
+    return concat(req)
 end
 
 
@@ -233,11 +255,11 @@ local function _do_cmd(self, ...)
 
     local reqs = self._reqs
     if reqs then
-        insert(reqs, req)
+        reqs[#reqs + 1] = req
         return
     end
 
-    -- print("request: ", table.concat(req, ""))
+    -- print("request: ", table.concat(req))
 
     local bytes, err = sock:send(req)
     if not bytes then
@@ -248,7 +270,7 @@ local function _do_cmd(self, ...)
 end
 
 
-function read_reply(self)
+function _M.read_reply(self)
     local sock = self.sock
     if not sock then
         return nil, "not initialized"
@@ -262,20 +284,29 @@ for i = 1, #commands do
     local cmd = commands[i]
 
     _M[cmd] =
-        function (self, ...)
-            return _do_cmd(self, cmd, ...)
-        end
+    function (self, ...)
+        return _do_cmd(self, cmd, ...)
+    end
 end
 
 
-function hmset(self, hashname, ...)
+function _M.hmset(self, hashname, ...)
     local args = {...}
     if #args == 1 then
         local t = args[1]
-        local array = {}
+
+        local n = 0
         for k, v in pairs(t) do
-            insert(array, k)
-            insert(array, v)
+            n = n + 2
+        end
+
+        local array = new_tab(n, 0)
+
+        local i = 0
+        for k, v in pairs(t) do
+            array[i + 1] = k
+            array[i + 2] = v
+            i = i + 2
         end
         -- print("key", hashname)
         return _do_cmd(self, "hmset", hashname, unpack(array))
@@ -286,17 +317,17 @@ function hmset(self, hashname, ...)
 end
 
 
-function init_pipeline(self)
-    self._reqs = {}
+function _M.init_pipeline(self, n)
+    self._reqs = new_tab(n or 4, 0)
 end
 
 
-function cancel_pipeline(self)
+function _M.cancel_pipeline(self)
     self._reqs = nil
 end
 
 
-function commit_pipeline(self)
+function _M.commit_pipeline(self)
     local reqs = self._reqs
     if not reqs then
         return nil, "no pipeline"
@@ -314,18 +345,22 @@ function commit_pipeline(self)
         return nil, err
     end
 
-    local vals = {}
-    for i = 1, #reqs do
+    local nvals = 0
+    local nreqs = #reqs
+    local vals = new_tab(nreqs, 0)
+    for i = 1, nreqs do
         local res, err = _read_reply(sock)
         if res then
-            insert(vals, res)
+            nvals = nvals + 1
+            vals[nvals] = res
 
         elseif res == nil then
             return nil, err
 
         else
             -- be a valid redis error value
-            insert(vals, {false, err})
+            nvals = nvals + 1
+            vals[nvals] = {false, err}
         end
     end
 
@@ -333,36 +368,27 @@ function commit_pipeline(self)
 end
 
 
-function array_to_hash(self, t)
-    local h = {}
-    for i = 1, #t, 2 do
+function _M.array_to_hash(self, t)
+    local n = #t
+    -- print("n = ", n)
+    local h = new_tab(0, n / 2)
+    for i = 1, n, 2 do
         h[t[i]] = t[i + 1]
     end
     return h
 end
 
 
-local class_mt = {
-    -- to prevent use of casual module global variables
-    __newindex = function (table, key, val)
-        error('attempt to write to undeclared variable "' .. key .. '"')
-    end
-}
-
-
-function add_commands(...)
+function _M.add_commands(...)
     local cmds = {...}
-    local newindex = class_mt.__newindex
-    class_mt.__newindex = nil
     for i = 1, #cmds do
         local cmd = cmds[i]
         _M[cmd] =
-            function (self, ...)
-                return _do_cmd(self, cmd, ...)
-            end
+        function (self, ...)
+            return _do_cmd(self, cmd, ...)
+        end
     end
-    class_mt.__newindex = newindex
 end
 
 
-setmetatable(_M, class_mt)
+return _M
