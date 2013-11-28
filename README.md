@@ -29,7 +29,7 @@ now框架将之前php框架中对这些问题解决的经验，带到了lua中�
 <li>一般都不写SQL，同时支持统一管理的SQL配置，方便进行统计报表类开发和DBA进行SQL优化</li>
 <li>支持跨数据库的关联查询，跨多类型数据库。比如一个表是mongo，一个表示mysql，一个表放在redis中。希望能一行代码把所有这些关联数据取出来</li>
 </ul>
-目前框架还在开发当中。大部分功能还没写完，具体的功能可以参考nowphp框架
+目前框架还在开发当中。大部分功能还没写完，具体的功能可以参考<a href="https://github.com/outrace/nowphp">nowphp</a>框架
 
 author
 ===
